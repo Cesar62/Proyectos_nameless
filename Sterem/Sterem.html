@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electroica Sterem</title>
+    <link rel="icon" href="imagenes/Logo_simbolo_T.png">
+    <link rel="stylesheet" href="../src/output.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="flex flex-row z-10 fixed bg-black p-4 w-full text-white font-bold text-xl">
+        <div class=" flex basis-full  justify-center">
+            <img src="imagenes/Logo_Sterem-Sin-fondo.png" alt="Sterem logo" class="inline-40">
+        </div>
+        <div class=" flex basis-full justify-center">
+
+        </div>
+        <div class="flex flex-row basis-full items-center justify-end gap-4 tracking-widest">
+            <button class="md:hidden cursor-pointer" onclick="toggleMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+            <a href="#Inicio"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">INICIO</a>
+            <a href="#Producto"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PRODUCTOS</a>
+            <a href="#personal"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PERSONAL</a>
+            <a href="#Contacto"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">CONTACTO</a>
+        </div>
+    </nav>
+    <!-- Menu desplegable -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-0 bg-black text-white w-full z-20">
+        <a href="#Inicio" class="block px-4 py-2 hover:bg-gray-700">INICIO</a>
+        <a href="#Producto" class="block px-4 py-2 hover:bg-gray-700">PRODUCTOS</a>
+        <a href="#personal" class="block px-4 py-2 hover:bg-gray-700">PERSONAL</a>
+        <a href="#Contacto" class="block px-4 py-2 hover:bg-gray-700">CONTACTO</a>
+    </div>
+
+    <!-- seccion de rellejo-->
+    <div class="h-18"></div>
+
+    <!-- Sección de inicio -->
+
+    <div class="flex flex-col items-center gap-4 p-6 bg-[url('../Sterem/imagenes/laptop-3.png')] bg-cover bg-center text-white ">
+        <h1 class="text-6xl font-bold">BIENVENIDO A STEREM</h1>
+        <div class="w-[50%]">
+            <p class="text-lg font-bold">
+                Sterem es una empresa en el mercado de dispositivos electrónicos, ofreciendo una amplia gama de 
+                productos de alta calidad para satisfacer las necesidades tecnológicas de nuestros clientes. Nos 
+                especializamos en la venta de teléfonos móviles, computadoras, tablets, laptops y accesorios electrónicos 
+                de última generación. En Sterem, nos comprometemos a brindar productos confiables y un servicio excepcional 
+                para garantizar la satisfacción total de nuestros clientes.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+
+</html>
