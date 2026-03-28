@@ -1,34 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/logo_miniv3.png">
     <link rel="stylesheet" href="src/output.css">
-    <title>Document</title>
+    <title>Nameless</title>
 
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="flex flex-row z-10 fixed bg-black w-full text-white font-bold text-lg">
-        <div class=" flex basis-full justify-start">
-            <div class="flex items-center gap-4 ml-[10%]">
-                <img src="images/logo_4.png" alt="Logo"
-                    class="hover:scale-110 hover:-rotate-3 transition-all duration-300 drop-shadow-[0_0_8px_#0029FF] brightness-150 hover:drop-shadow-[0_0_14px_#4a9eff] hover:brightness-200 transition-all duration-300 ">
-                <p> Hola</p>
-            </div>
-
+    <nav class="flex flex-row z-10 fixed bg-black p-2 w-full text-white font-bold text-xl">
+        <div class=" flex basis-[20%]  justify-center">
+            <img src="images/logo_4.png" alt="Tux Technologies logo"
+                class="inline-20 hover:scale-110 hover:-rotate-3 transition-all duration-300 drop-shadow-[0_0_8px_#0029FF] brightness-150 hover:drop-shadow-[0_0_14px_#4a9eff] hover:brightness-200 transition-all duration-300">
         </div>
-        <div class=" flex basis-full justify-end">
-            <div class="flex items-center gap-4 mr-[10%]">
-                <p> Hola</p>
-            </div>
+        <div class=" flex basis-[20%] justify-center"></div>
+        <div class="flex flex-row basis-[60%] items-center justify-end gap-4 tracking-widest">
+            <button class="md:hidden cursor-pointer" onclick="toggleMenu()">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+            <a href="#Inicio"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">INICIO</a>
+            <a href="#SobreMi"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">SOBRE
+                MI</a>
+            <a href="#Tecnologias"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">TECNOLOGÍAS</a>
+            <a href="#Proyectos"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PROYECTOS</a>
         </div>
     </nav>
+
+    <!-- Menu desplegable -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-0 bg-black text-white w-full z-20">
+        <a href="#Inicio" class="block px-4 py-2 hover:bg-gray-700">INICIO</a>
+        <a href="#SobreMi" class="block px-4 py-2 hover:bg-gray-700">SOBRE MI</a>
+        <a href="#Tecnologias" class="block px-4 py-2 hover:bg-gray-700">TECNOLOGÍAS</a>
+        <a href="#Proyectos" class="block px-4 py-2 hover:bg-gray-700">PROYECTOS</a>
+    </div>
+
+
     <!-- seccion de relleno   -->
-    <div class="h-10"></div>
+    <div id="Inicio" class="md:h-15 h-10"></div>
 
     <!-- primera sección -->
     <div
@@ -37,7 +57,7 @@
     </div>
 
     <!-- Sobre mí -->
-    <div class="flex flex-col flex-wrap place-content-center gap-8 p-8 bg-slate-950 text-white">
+    <div id="SobreMi" class="flex flex-col flex-wrap place-content-center gap-8 p-8 bg-slate-950 text-white">
         <div class="flex justify-center gap-8">
             <div
                 class="flex flex-wrap md:gap-4 place-content-center bg-gray-900/50 md:p-5 p-2 rounded-md w-[50%] md:h-auto h-70 overflow-y-auto md:text-xl text-xs">
@@ -55,7 +75,7 @@
 
         <!-- Tecnologías -->
 
-        <div class="basis-full">
+        <div id="Tecnologias" class="basis-full">
             <h1 class="md:text-4xl text-large text-center font-bold"> Tecnologías </h1>
         </div>
         <div
@@ -66,29 +86,66 @@
         </div>
 
         <!-- Proyectos -->
-        <div class="basis-full">
+        <div id="Proyectos" class="basis-full">
             <h1 class="md:text-4xl text-large text-center font-bold"> Proyectos </h1>
         </div>
-        <div
-            class="flex flex-row justify-center p-4 gap-8 bg-gray-900">
+        <div class="flex flex-row justify-center p-4 gap-8 bg-gray-900">
             <div
-                class="flex flex-wrap md:gap-4 place-content-center justify-center  bg-slate-950 md:p-5 p-2 rounded-md w-[25%] md:h-auto h-70 overflow-y-auto md:text-xl text-xs">
+                class="flex flex-wrap md:gap-4 place-content-center justify-center  bg-slate-950 md:p-5 p-2 rounded-md md:w-[25%] w-[50%] md:h-auto h-70 overflow-y-auto md:text-xl text-xs">
                 <img src="images/proyectos/Logo_Sterem-Sin-fondo.png" alt="cesar" class="inline-50">
-                <p class="md:text-justify">Tienda virtual de electronicos, con un diseño moderno y atractivo, 
+                <p class="md:text-justify">Tienda virtual de electronicos, con un diseño moderno y atractivo,
                     con una amplia variedad de productos y una experiencia de compra fácil y segura.
                 </p>
-                <a href="Sterem/Sterem.html" class="text-white underline font-bold hover:text-blue-700" target="_blank">visitalo aqui</a>
+                <a href="Sterem/Sterem.html" class="text-white underline font-bold hover:text-blue-700"
+                    target="_blank">visitalo aqui</a>
             </div>
             <div
-                class="flex flex-wrap md:gap-4 place-content-center bg-slate-950 md:p-5 p-2 rounded-md w-[25%] md:h-auto h-70 overflow-y-auto md:text-xl text-xs">
-                 <img src="images/proyectos/Logo_tuxpets.png" alt="cesar" class="size-20">
+                class="flex flex-wrap md:gap-4 place-content-center bg-slate-950 md:p-5 p-2 rounded-md md:w-[25%] w-[50%] md:h-auto h-70 overflow-y-auto md:text-xl text-xs">
+                <img src="images/proyectos/Logo_tuxpets.png" alt="cesar" class="size-20">
                 <p class="md:text-justify">
-                    Tienda virtual de electronicos, con un diseño moderno y atractivo, con una amplia variedad de productos y una experiencia de compra fácil y segura.
+                    Tienda virtual de electronicos, con un diseño moderno y atractivo, con una amplia variedad de
+                    productos y una experiencia de compra fácil y segura.
                 </p>
-                <a href="https://tuxpets.free.nf" class="text-white underline font-bold hover:text-blue-700" target="_blank">visitalo aqui</a>
+                <a href="https://tuxpets.free.nf" class="text-white underline font-bold hover:text-blue-700"
+                    target="_blank">visitalo aqui</a>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <div class="flex flex-col items-center gap-2 p-8 bg-black text-white">
+        <h2 class="text-5xl font-bold mb-6 text-center">CONTACTO</h2>
+        <div class="flex flex-col place-content-center gap-4  gap-4 p-6">
+            <p class="text-center">información de contacto:</p>
+            <div class="flex flex-row w-auto items-start gap-2">
+                <div class="flex flex-row items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v２．２５Z" />
+                    </svg>
+                    <p class="inline-block">2536-8194</p>
+                </div>
+                <div class="flex flex-row items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                    </svg>
+                    <p class="inline-block">Nameless@gmail.com</p>
+                </div>
+            </div>
+
+        </div>
+        <p class="text-lg">© 2026 Nameless. Todos los derechos reservados.</p>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
 
 </body>
 
