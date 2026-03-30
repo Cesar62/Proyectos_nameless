@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <!-- Navbar -->
+    <!--Navbar -->
     <nav class="flex flex-row z-10 fixed bg-black p-2 w-full text-white font-bold text-xl">
         <div class=" flex basis-full  justify-start">
             <img src="imagenes/Logo_tux_technologies.jpeg" alt="Tux Technologies logo" class="ml-20 inline-30">
@@ -24,33 +24,33 @@
                     </path>
                 </svg>
             </button>
-            <a href="#Inicio"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">INICIO</a>
-            <a href="#Producto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PRODUCTOS</a>
-            <a href="#Contacto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">CONTACTO</a>
+            <a href="#Inicio"  data-target="Inicio"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">INICIO</a>
+            <a href="#Producto" data-target="Producto"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">PRODUCTOS</a>
+            <a href="#Contacto" data-target="Contacto"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">CONTACTO</a>
             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
         </div>
     </nav>
-    <!-- Menu desplegable -->
-    <div id="mobile-menu" class="hidden md:hidden absolute top-16 right-0 bg-black text-white w-full z-20">
-        <a href="#Inicio" class="block px-4 py-2 hover:bg-gray-700">INICIO</a>
-        <a href="#Producto" class="block px-4 py-2 hover:bg-gray-700">PRODUCTOS</a>
-        <a href="#Contacto" class="block px-4 py-2 hover:bg-gray-700">CONTACTO</a>
+    <!-- Menú desplegable para pantallas pequeñas -->
+    <div id="mobile-menu" class="hidden md:hidden  fixed top-16 right-0 bg-black text-white w-full z-20">
+        <a href="#Inicio" onclick="toggleMenu()" data-target="Inicio" class="block px-4 py-2 hover:bg-gray-700 nav-link">INICIO</a>
+        <a href="#Producto" onclick="toggleMenu()" data-target="Producto" class="block px-4 py-2 hover:bg-gray-700 nav-link">PRODUCTOS</a>
+        <a href="#Contacto" onclick="toggleMenu()" data-target="Contacto" class="block px-4 py-2 hover:bg-gray-700 nav-link">CONTACTO</a>
     </div>
 
-    <!-- seccion de rellejo-->
+    <!-- Espacio-->
     <div id="Inicio" class="h-15"></div>
 
-    <!-- Sección de inicio -->
+    <!-- Sección principal de bienvenida -->
 
     <div
         class="flex flex-col items-center gap-4 p-6 bg-[url('../Tux_technologies/imagenes/laptop-3.png')] bg-cover bg-center text-white ">
         <h1 class="md:text-6xl text-2xl font-bold text-center">BIENVENIDO A TUX TECHNOLOGIES</h1>
-        <div class="md:w-[50%] w-[75%] p-4 bg-gray-900/50 rounded-lg">
+        <div class="md:w-[50%] w-full p-4 bg-gray-900/50 rounded-lg overflow-y-auto block">
             <p class="md:text-lg text-xs font-bold">
                 Tux Technologies es una empresa en el mercado de dispositivos electrónicos, ofreciendo una amplia gama
                 de
@@ -66,9 +66,8 @@
     </div>
 
     <!-- Sección de productos -->
-
-    <section class="p-8 bg-[url('../Tux_technologies/imagenes/Fondo_P.jpg')] bg-fixed bg-cover bg-center text-white">
-        <h2 id="Producto" class="text-5xl font-bold mb-6 text-center">CATALOGO</h2>
+    <section id="Producto" class="p-8 bg-[url('../Tux_technologies/imagenes/Fondo_P.jpg')] bg-fixed bg-cover bg-center text-white">
+        <h2 class="text-5xl font-bold mb-6 text-center">CATALOGO</h2>
 
         <div class="flex place-content-center justify-center  gap-4 min-w-max px-2">
             <div
@@ -81,12 +80,12 @@
         </div>
     </section>
 
-    <!-- Contacto -->
+    <!-- Sección con información de contacto y redes sociales -->
     <section id="Contacto" class="flex flex-col items-center p-8 bg-black text-white">
         <h2 class="text-5xl font-bold mb-6 text-center">CONTACTO</h2>
-        <div class="flex flex-row place-content-center gap-4 w-full gap-4 p-6">
-            <div class="flex flex-col w-[25%] items-start gap-2">
-                <p>información de contacto:</p>
+        <div class="flex md:flex-row flex-col place-content-center items-center md:gap-4 gap-1 w-full p-6">
+            <div class="flex flex-col md-auto md:w-[25%] items-start gap-2">
+                <p class="md:text-2xl text-lg">información de contacto:</p>
                 <div class="flex flex-row items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6">
@@ -114,9 +113,9 @@
                     <p class="inline-block">Tuxtechnologies@gmail.com</p>
                 </div>
             </div>
-            <div class="w-[25%]"></div>
-            <div class="flex flex-col w-[25%] items-center gap-2">
-                <p class="text-2xl">Redes sociales:</p>
+            <div class="md:w-[25%] w-full"></div>
+            <div class="flex flex-col w-full md:w-[25%] items-center gap-2">
+                <p class="md:text-2xl text-lg">Redes sociales:</p>
                 <div class="flex flex-row gap-4">
                     <div class="flex flex-row items-center gap-2">
                         <img src="imagenes/iconos/facebook.png" alt="facebook"
@@ -138,8 +137,8 @@
             </div>
 
         </div>
-        <div class="flex flex-col items-center gap-2 w-[50%]">
-            <img src="imagenes/Logo_tux_technologies.jpeg" alt="Tux Technologies logo" class="inline-50">
+        <div class="flex flex-col items-center gap-2 w-full md:w-[50%]">
+            <img src="imagenes/Logo_tux_technologies.jpeg" alt="Tux Technologies logo" class="inline-block w-50">
             <p class="text-lg">Conectando tu mundo con tecnología de excelencia.</p>
             <p class="text-sm">© 2024 Tux Technologies. Todos los derechos reservados.</p>
         </div>
@@ -149,10 +148,43 @@
 
 
     <script>
+        // Muestra u oculta el menú móvil al pulsar el botón hamburguesa.
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
+
+        // Hace scroll suave hacia una sección sin dejar la ancla (#) en la URL.
+        function scrollWithoutAnchor(targetId) {
+            const target = document.getElementById(targetId);
+            const nav = document.querySelector('nav');
+
+            // Si la sección no existe, se cancela la acción.
+            if (!target) {
+                return;
+            }
+
+            // Se descuenta la altura del nav fijo para que el título no quede tapado.
+            const offset = nav ? nav.offsetHeight : 0;
+            const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+
+            // Desplazamiento suave hacia la sección elegida.
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+
+            // Limpia la URL para que el botón "Atrás" vuelva a la página anterior.
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+
+        // Asigna el comportamiento personalizado a todos los enlaces del menú.
+        document.querySelectorAll('.nav-link').forEach((link) => { //Agregamos la clase "nav-link" a los enlaces para seleccionarlos fácilmente
+            link.addEventListener('click', function (event) {
+                event.preventDefault(); // Evita el comportamiento predeterminado del enlace
+                scrollWithoutAnchor(this.dataset.target);
+            });
+        });
     </script>
 </body>
 

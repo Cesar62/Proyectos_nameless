@@ -66,10 +66,9 @@
                     </select>
                 </div>
                 <div class="flex flex-row items-center gap-4">
+                    <input type="text" placeholder="Marca" class="p-2 border-black border-2 rounded-lg">
                     <input type="text" placeholder="cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none">
-                    <textarea placeholder="Descripcion"
-                        class="p-2 w-60 border-black border-2 rounded-lg resize-none"></textarea>
                 </div>
             </div>
 
@@ -90,11 +89,16 @@
                 <div id="preview" class="w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center">
                     <span class="cursor-default text-gray-500">Vista previa de la imagen</span>
                 </div>
+                <!-- Botones-->
                 <div class="flex flex-col items-center gap-4">
                     <button id="Guardar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 text-white rounded-lg">Guardar</button>
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg">Guardar</button>
                     <button id="Buscar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-yellow-500 text-white rounded-lg">Buscar</button>
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg">Buscar</button>
+                    <button
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg">Eliminar</button>
+                    <button
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg">Actualizar</button>
                 </div>
             </div>
 
@@ -108,7 +112,8 @@
                 <div class="flex flex-row items-center gap-4 text-white">
                     <button id="AceptModal"
                         class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg">Si</button>
-                    <button id="closeModal" class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg">NO</button>
+                    <button id="closeModal"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg">NO</button>
                 </div>
 
             </div>
@@ -122,7 +127,7 @@
     var productosDiv = document.getElementById('productos');
     var categoriaDiv = document.getElementById('Categoria');
     var Editar_crearSelect = document.getElementById('Editar_crear');
-    
+
 
     if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
         accionesSelect.addEventListener('change', function () { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
