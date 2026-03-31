@@ -24,12 +24,8 @@
                     </path>
                 </svg>
             </button>
-            <a href="#Inicio" data-target="Inicio"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">INICIO</a>
             <button
                 class="hover:text-gray-600 hover:bg-white cursor-pointer  rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">CATEGORÍAS</button>
-            <a href="#Contacto" data-target="Contacto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden nav-link">CONTACTO</a>
             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
@@ -40,14 +36,23 @@
     <div id="Inicio" class="h-15"></div>
 
     <!-- Productos -->
-    <div class="flex flex-row justify-center bg-green-600 text-white"> 
-        <!-- seccion de filtrar -->
-        <div class="flex flex-row flex-wrap bg-grey-600 justify-center gap-x-2 w-[15%] p-2">
-            <h1 class="text-lg font-bold">Filtrar</h1>
+    <div class="flex flex-row justify-start text-white h-screen">
+        <!-- filtrar -->
+        <div class="flex flex-col place-items-center place-content-center gap-4 p-2 bg-gray-300 w-[15%]">
+            <div class="fixed basis-full w-50 p-2 bg-black/60">
+                <h1 class="text-lg font-bold">Filtrar</h1>
+                <input type="checkbox" name=""> <label for="">Filtrar</label>
+            </div>
         </div>
+
         <!-- seccion de productos -->
-        <div class="flex flex-row flex-wrap  bg-blue-600 w-[85%] p-6">
-            <p>hola</p>
+        <div class="flex flex-col items-center gap-4 p-6  bg-slate-600 w-[85%] p-6">
+            <h1 class="text-2xl font-bold">PRODUCTOS</h1>
+            <div class="flex flex-row flex-wrap items-center justify-center gap-4">
+                <div class="flex flex-col items-center size-50 bg-black rounded-lg p-2 overflow-y-auto block">
+                    <p>hola</p>
+                </div>
+            </div>
         </div>
     </div>
 </body>
