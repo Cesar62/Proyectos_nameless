@@ -1,3 +1,7 @@
+<?php
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -53,8 +57,7 @@
                     <option value="Categoria">Categoria</option>
                 </select>
             </div>
-
-            <div id="productos" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
+            <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
                     <input type="text" placeholder="Precio" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none">
@@ -68,10 +71,11 @@
                 <div class="flex flex-row items-center gap-4">
                     <input type="text" placeholder="Marca" class="p-2 border-black border-2 rounded-lg">
                     <input type="text" placeholder="cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
-                        class="p-2 border-black border-2 rounded-lg appearance-none">
+                        class="p-2 w-60 border-black border-2 rounded-lg appearance-none">
                 </div>
             </div>
 
+            <!-- Categoria -->
             <div id="Categoria" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
                 <div class="flex flex-row items-center gap-4">
                     <textarea placeholder="Descripcion"
@@ -81,7 +85,7 @@
 
 
             <!-- Agregar imagen-->
-            <div id="Imagen" class="flex flex-row items-center gap-4 hidden">
+            <div id="Imagen" class="flex flex-row p-2 items-center gap-4 hidden">
                 <input type="file" accept="image/*" id="fileInput" class="hidden">
                 <button onclick="document.getElementById('fileInput').click()"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
@@ -122,86 +126,95 @@
 </body>
 
 <script>
-    var accionesSelect = document.getElementById('acciones');
-    var ImagenDiv = document.getElementById('Imagen');
-    var productosDiv = document.getElementById('productos');
-    var categoriaDiv = document.getElementById('Categoria');
-    var Editar_crearSelect = document.getElementById('Editar_crear');
+var accionesSelect = document.getElementById('acciones');
+var ImagenDiv = document.getElementById('Imagen');
+var productosDiv = document.getElementById('productos');
+var categoriaDiv = document.getElementById('Categoria');
+var Editar_crearSelect = document.getElementById('Editar_crear');
 
 
-    if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-        accionesSelect.addEventListener('change', function () { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-            var selectedValue = this.value;
-            switch (selectedValue) {
-                case 'Crear':
-                    ImagenDiv.classList.add('hidden');
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Producto':
-                    ImagenDiv.classList.remove('hidden');
-                    productosDiv.classList.remove('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Categoria':
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.remove('hidden');
-                    ImagenDiv.classList.remove('hidden');
-                    break;
-                default:
-                    console.log('Opción no válida');
+if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
+    accionesSelect.addEventListener('change',
+function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+        var selectedValue = this.value;
+        switch (selectedValue) {
+            case 'Crear':
+                ImagenDiv.classList.add('hidden');
+                productosDiv.classList.add('hidden');
+                categoriaDiv.classList.add('hidden');
+                break;
+            case 'Producto':
+                ImagenDiv.classList.remove('hidden');
+                productosDiv.classList.remove('hidden');
+                categoriaDiv.classList.add('hidden');
+                break;
+            case 'Categoria':
+                productosDiv.classList.add('hidden');
+                categoriaDiv.classList.remove('hidden');
+                ImagenDiv.classList.remove('hidden');
+                break;
+            default:
+                console.log('Opción no válida');
+        }
+    });
+}
+
+var fileInput = document.getElementById('fileInput');
+var preview = document.getElementById('preview');
+
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        var file = this.files[0]; //Obtiene la primera imagen seleccionada
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result +
+                    '" class="w-full h-full object-cover rounded-lg">';
             }
-        });
-    }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
+        }
+    });
+}
 
-    var fileInput = document.getElementById('fileInput');
-    var preview = document.getElementById('preview');
+//Funciones del modal
 
-    if (fileInput) {
-        fileInput.addEventListener('change', function () {
-            var file = this.files[0]; //Obtiene la primera imagen seleccionada
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" class="w-full h-full object-cover rounded-lg">';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
-            }
-        });
-    }
+var Modal = document.getElementById('modal');
+var closeModalButton = document.getElementById('closeModal');
+var GuardarButton = document.getElementById('Guardar');
+var BuscarButton = document.getElementById('Buscar');
+var M_Title = document.getElementById('M_Title');
+var M_Content = document.getElementById('M_content');
 
-    //Funciones del modal
+if (GuardarButton) {
+    GuardarButton.addEventListener('click', function() {
+        Modal.classList.remove('hidden');
+        M_Title.value = "Guardar Producto";
+        M_Content.textContent = "¿Esta seguro de guardar " + accionesSelect.value +
+        " ?"; //Cambia el texto segun la seleccion
+    });
+}
 
-    var Modal = document.getElementById('modal');
-    var closeModalButton = document.getElementById('closeModal');
-    var GuardarButton = document.getElementById('Guardar');
-    var BuscarButton = document.getElementById('Buscar');
-    var M_Title = document.getElementById('M_Title');
-    var M_Content = document.getElementById('M_content');
+if (BuscarButton) {
+    BuscarButton.addEventListener('click', function() {
+        Modal.classList.remove('hidden');
+        M_Title.value = "Buscar Producto";
+        M_Content.textContent = "¿Desea buscar " + accionesSelect.value +
+        " ?"; //Cambia el texto segun la seleccion 
+    });
+}
 
-    if (GuardarButton) {
-        GuardarButton.addEventListener('click', function () {
-            Modal.classList.remove('hidden');
-            M_Title.value = "Guardar Producto";
-            M_Content.textContent = "¿Esta seguro de guardar " + accionesSelect.value + " ?"; //Cambia el texto segun la seleccion
-        });
-    }
+if (closeModalButton) {
+    closeModalButton.addEventListener('click', function() {
+        Modal.classList.add('hidden');
+    });
+}
 
-    if (BuscarButton) {
-        BuscarButton.addEventListener('click', function () {
-            Modal.classList.remove('hidden');
-            M_Title.value = "Buscar Producto";
-            M_Content.textContent = "¿Desea buscar " + accionesSelect.value + " ?"; //Cambia el texto segun la seleccion 
-        });
-    }
-
-    if (closeModalButton) {
-        closeModalButton.addEventListener('click', function () {
-            Modal.classList.add('hidden');
-        });
-    }
+//Si recarga pagina reiniciar select 
+window.onbeforeunload = function(e) {
+  accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+};
 </script>
 
 </html>
