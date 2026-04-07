@@ -1,4 +1,33 @@
 <?php
+include 'Config/BD.php';
+
+$btn = $_POST['Accion'] ?? null;
+
+if ($btn) {
+    switch ($btn) {
+        case 'Guardar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si"
+            // Por ejemplo, podrías realizar una consulta a la base de datos o redirigir a otra página
+            echo "Has Guardado el producto.";
+            break;
+        case 'Buscar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si"
+            echo "Has Buscado el producto.";
+            break;
+
+        case 'Eliminar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si"
+            echo "Has Eliminado el producto.";
+            break;
+        case 'Actualizar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si" 
+            echo "Has Actualizado el producto.";
+            break;
+        // Puedes agregar más casos para otras acciones si es necesario
+        default:
+            echo "Acción no reconocida.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -43,9 +72,10 @@
 
     <!--espacio de relleno-->
     <div class="h-16"></div>
+        
 
     <!-- Menu del admin -->
-    <section class="flex flex-col items-center mt-8">
+    <form action="Adm_tux.php" method="post"  class="flex flex-col items-center mt-8">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Administración</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
@@ -94,14 +124,18 @@
                 </div>
                 <!-- Botones-->
                 <div class="flex flex-col items-center gap-4">
-                    <button id="Guardar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg">Guardar</button>
-                    <button id="Buscar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg">Buscar</button>
-                    <button
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg">Eliminar</button>
-                    <button
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg">Actualizar</button>
+                    <input id="Guardar"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
+                        type="button" value="Guardar">
+                    <input id="Buscar"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
+                        type="button" value="Buscar">
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
+                        type="button" value="Eliminar">
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                        type="button" value="Actualizar">
                 </div>
             </div>
 
@@ -113,15 +147,15 @@
                 <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
                 <p id="M_content" class="mb-4"></p>
                 <div class="flex flex-row items-center gap-4 text-white">
-                    <button id="AceptModal"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg">Si</button>
+                    <input id="AceptModal" class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg"
+                        type="submit" name="Accion" value="Si">
                     <button id="closeModal"
                         class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg">NO</button>
                 </div>
 
             </div>
         </div>
-    </section>
+    </form>
 </body>
 
 <script>
@@ -134,28 +168,28 @@ var Editar_crearSelect = document.getElementById('Editar_crear');
 
 if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
     accionesSelect.addEventListener('change',
-function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-        var selectedValue = this.value;
-        switch (selectedValue) {
-            case 'Crear':
-                ImagenDiv.classList.add('hidden');
-                productosDiv.classList.add('hidden');
-                categoriaDiv.classList.add('hidden');
-                break;
-            case 'Producto':
-                ImagenDiv.classList.remove('hidden');
-                productosDiv.classList.remove('hidden');
-                categoriaDiv.classList.add('hidden');
-                break;
-            case 'Categoria':
-                productosDiv.classList.add('hidden');
-                categoriaDiv.classList.remove('hidden');
-                ImagenDiv.classList.remove('hidden');
-                break;
-            default:
-                console.log('Opción no válida');
-        }
-    });
+        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+            var selectedValue = this.value;
+            switch (selectedValue) {
+                case 'Crear':
+                    ImagenDiv.classList.add('hidden');
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    break;
+                case 'Producto':
+                    ImagenDiv.classList.remove('hidden');
+                    productosDiv.classList.remove('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    break;
+                case 'Categoria':
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.remove('hidden');
+                    ImagenDiv.classList.remove('hidden');
+                    break;
+                default:
+                    console.log('Opción no válida');
+            }
+        });
 }
 
 var fileInput = document.getElementById('fileInput');
@@ -177,32 +211,35 @@ if (fileInput) {
     });
 }
 
+
+//Si recarga pagina reiniciar select 
+window.onbeforeunload = function(e) {
+    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+};
+
+
+//funciones de los botones de accion
 //Funciones del modal
 
 var Modal = document.getElementById('modal');
 var closeModalButton = document.getElementById('closeModal');
-var GuardarButton = document.getElementById('Guardar');
-var BuscarButton = document.getElementById('Buscar');
+var ActionButtons = document.querySelectorAll('.Action-B');
 var M_Title = document.getElementById('M_Title');
 var M_Content = document.getElementById('M_content');
+var AceptModalButton = document.getElementById('AceptModal');
 
-if (GuardarButton) {
-    GuardarButton.addEventListener('click', function() {
-        Modal.classList.remove('hidden');
-        M_Title.value = "Guardar Producto";
-        M_Content.textContent = "¿Esta seguro de guardar " + accionesSelect.value +
-        " ?"; //Cambia el texto segun la seleccion
+ActionButtons.forEach(function(button) {
+    button.addEventListener('click', function() {
+        Modal.classList.remove('hidden'); // Muestra el modal
+        M_Title.value = button.value + " " + accionesSelect
+        .value; // Cambia el título del modal según el botón de acción presionado
+        M_Content.textContent = "¿Esta seguro de " + button
+            .value + " " + accionesSelect.value +
+            " ?"; //Cambia el texto segun la seleccion
+        AceptModalButton.value = button
+            .value; // Cambia el valor del botón de aceptar según el botón de acción presionado
     });
-}
-
-if (BuscarButton) {
-    BuscarButton.addEventListener('click', function() {
-        Modal.classList.remove('hidden');
-        M_Title.value = "Buscar Producto";
-        M_Content.textContent = "¿Desea buscar " + accionesSelect.value +
-        " ?"; //Cambia el texto segun la seleccion 
-    });
-}
+});
 
 if (closeModalButton) {
     closeModalButton.addEventListener('click', function() {
@@ -210,10 +247,7 @@ if (closeModalButton) {
     });
 }
 
-//Si recarga pagina reiniciar select 
-window.onbeforeunload = function(e) {
-  accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-};
+
 </script>
 
 </html>
