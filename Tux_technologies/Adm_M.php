@@ -1,3 +1,12 @@
+<?php
+require 'Config/BD.php';
+
+session_start();
+
+$SesionA = $_SESSION["ADSESION"]["Sesion"] ?? false;
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,7 +34,8 @@
                     </path>
                 </svg>
             </button>
-            <div class="w-10 h-10 hover:scale-110 bg-white rounded-full flex items-center justify-center cursor-pointer">
+            <div
+                class="w-10 h-10 hover:scale-110 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
         </div>
@@ -52,6 +62,46 @@
                 </a>
             </div>
         </div>
-</body>
+    </div>
 
+    <?php if($SesionA == false): ?>
+
+    <!--Login-->
+    <div id=modal class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
+        <div class='flex flex-col gap-4 justify-center bg-black p-6 rounded-lg text-white border-white border'>
+            <h2 class='text-2xl font-bold mb-2'>Iniciar Sesion</h2>
+            <input type="email" id="email" pattern=".+@example\.com" placeholder="Ingresar Correo"
+                class="p-2 border-2 border-white rounded-lg">
+            <div class="flex flex-row items-center justify-end">
+                <input id="Ipass" type="password" placeholder="ingrese contraseña"
+                    class="p-2 border-2 border-white rounded-lg">
+                <button id="btnp" class="absolute bg-white m-2 rounded-lg cursor-pointer hover:scale-110" onclick="contraseña()"><svg
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6 fill-black">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                </button>
+            </div>
+            <button class="bg-white p-2 rounded-lg hover:scale-105 cursor-pointer text-black font-bold transition delay-50 duration-200 ">Iniciar Sesion</button>
+        </div>
+    </div>
+    <?php endif?>
+</body>
+<script src="js/General.js"></script>
+<script>
+
+    //cambiar visibilidad de la contraseña
+var btnp = document.getElementById("btnp");
+var Ipass = document.getElementById("Ipass");
+
+function contraseña() {
+    if (Ipass.type == "password") {
+        Ipass.type = "text"
+    } else {
+        Ipass.type = "password"
+    }
+}
+</script>
 </html>

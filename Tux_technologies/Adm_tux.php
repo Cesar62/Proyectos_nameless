@@ -141,7 +141,7 @@ if ($btn) {
                     Imagen</button>
                 <div id="preview" class="w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
                     <span class="cursor-default text-gray-500">Vista previa de la imagen</span>
-                </div>      
+                </div>
                 <!-- Botones-->
                 <div class="flex flex-col items-center gap-4">
                     <input id="Guardar"
@@ -258,11 +258,6 @@ window.onbeforeunload = function(e) {
 
 //funciones de los botones de accion
 //Funciones del modal
-
-var Modal = document.getElementById('modal');
-var Modal2 = document.getElementById('modal2');
-var Modal3 = document.getElementById('modal3');
-var closeModalButton = document.querySelectorAll('.CloseModal');
 var ActionButtons = document.querySelectorAll('.Action-B');
 var M_Title = document.getElementById('M_Title');
 var M_Content = document.getElementById('M_content');
@@ -273,14 +268,14 @@ ActionButtons.forEach(function(button) {
         // Validar campos vacíos
 
         if (accionesSelect.value === "Producto") {
-          var  ElementosPDTOBJ = document.querySelectorAll('.PDTOBJ');
+            var ElementosPDTOBJ = document.querySelectorAll('.PDTOBJ');
         } else if (accionesSelect.value === "Categoria") {
-          var  ElementosPDTOBJ = document.querySelectorAll('.CATOBJ');
+            var ElementosPDTOBJ = document.querySelectorAll('.CATOBJ');
         } else {
-          var  ElementosPDTOBJ = [];
+            var ElementosPDTOBJ = [];
         }
 
-        var vacio = false                   
+        var vacio = false
 
         for (const elemento of ElementosPDTOBJ) {
             if (elemento.value.trim() === '') {
@@ -302,15 +297,8 @@ ActionButtons.forEach(function(button) {
         }
     });
 });
-
-
-closeModalButton.forEach(function(button) {
-    button.addEventListener('click', function() {
-        if (Modal) Modal.classList.add('hidden'); // Oculta el modal
-        if (Modal2) Modal2.classList.add('hidden'); // Oculta el modal2
-        if (Modal3) Modal3.classList.add('hidden'); // Oculta el modal3
-    });
-});
 </script>
+
+<script src="js/General.js"></script>
 
 </html>
