@@ -1,51 +1,6 @@
 <?php
 include 'Config/BD.php';
 
-$btn = $_POST['Accion'] ?? null;
-$Acciones = $_POST['acciones'] ?? "Error";
-
-if ($btn) {
-    switch ($btn) {
-        case 'Guardar':
-            if ($Acciones == "Producto") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para Producto
-                echo "Has Guardado el producto.";
-            } elseif ($Acciones == "Categoria") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para Categoria
-                echo "Has Guardado la categoria.";
-            } else {
-                echo "Acción no reconocida para Guardar.";
-            }
-            break;
-        case 'Buscar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si"
-            echo "Has Buscado el producto.";
-            break;
-
-        case 'Eliminar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si"
-            echo "Has Eliminado el producto.";
-            break;
-        case 'Actualizar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si" 
-            echo "Has Actualizado el producto.";
-            break;
-        // Puedes agregar más casos para otras acciones si es necesario
-        default:
-            echo "Acción no reconocida.";
-    }
-    
-
-    echo "
-        <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
-            <div class='bg-white p-6 rounded-lg'>
-                <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
-                <p class='mb-4'>$btn $Acciones con exito</p>
-                <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
-            </div>
-        </div>
-    ";
-}
 ?>
 
 <!DOCTYPE html>
@@ -76,12 +31,8 @@ if ($btn) {
                     </path>
                 </svg>
             </button>
-            <a href="#Inicio"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">INICIO</a>
-            <a href="#Producto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PRODUCTOS</a>
-            <a href="#Contacto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">CONTACTO</a>
+            <a href="Adm_M.php"
+                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">Menu</a>
             <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
@@ -91,214 +42,78 @@ if ($btn) {
     <!--espacio de relleno-->
     <div class="h-16"></div>
 
-
-    <!-- Menu del admin -->
-    <form action="Adm_tux.php" method="post" class="flex flex-col items-center mt-8">
-        <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
+    <!--Panel del admin-->
+    <div class="flex flex-col items-center mt-8">
+        <div class="flex flex-col w-[75%] gap-2 items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Administración</h1>
-            <div class="flex flex-row items-center p-4 justify-center gap-4 ">
-                <input type="text" placeholder="Nombre" class="p-2 border-black border-2 rounded-lg PDTOBJ CATOBJ">
-                <select id="acciones" name="acciones" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg"
-                    required>
-                    <option value="" disabled selected>Que Desea Crear</option>
-                    <option value="Producto">Producto</option>
-                    <option value="Categoria">Categoria</option>
-                </select>
+            <div class="flex flex-row w-[100%] gap-2">
+                <input type="button" value="Registrar Empleados"
+                    class="p-1 border border-black rounded-lg cursor-pointer hover:scale-105 SButton">
+                <input type="button" value="Lista de Empleados"
+                    class="p-1 border border-black rounded-lg cursor-pointer hover:scale-105 SButton">
+                <input id="accionesSelect" type="text" class="hidden" value="RegistrarEmpleados">
             </div>
-            <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
-                <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Precio" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
-                        class="p-2 border-black border-2 rounded-lg appearance-none PDTOBJ">
-                    <select class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg PDTOBJ select">
-                        <option value="Categoria" disabled selected>Categoria</option>
-                        <option value="Categoria1">Categoria 1</option>
-                        <option value="Categoria2">Categoria 2</option>
-                        <option value="Categoria3">Categoria 3</option>
+            <form action="Adm_tux.php" method="post" class="flex flex-col w-[100%] gap-2 items-center">
+                <h2 class="text-xl font-bold">Registrar Nuevo Empleado</h2>
+                <div class="flex flex-row gap-2">
+                    <input type="text" placeholder="Nombre" name="Nombre"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                    <input type="text" placeholder="Apellido"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                </div>
+                <div class="flex flex-row gap-2">
+                    <input type="text" placeholder="Correo"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                    <input type="text" placeholder="Contraseña"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                </div>
+                <div class="flex flex-row gap-2">
+                    <select class="p-1 w-30 cursor-pointer border-black border-2 rounded-lg select">
+                        <option value="Categoria" disabled selected>Cargo</option>
+                        <option value="Categoria1">Administrador</option>
+                        <option value="Categoria2">Empleado</option>
                     </select>
+                    <input type="button" value="Registrar" class="p-2 w-30 border-black border-2 rounded-lg Action-B">
                 </div>
-                <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Marca" class="p-2 border-black border-2 rounded-lg PDTOBJ">
-                    <input type="text" placeholder="cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
-                        class="p-2 w-60 border-black border-2 rounded-lg appearance-none PDTOBJ">
+                <!-- Modal-->
+                <div id="modal" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
+                    <div class="bg-white p-6 rounded-lg">
+                        <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
+                        <p id="M_content" class="mb-4"></p>
+                        <div class="flex flex-row items-center gap-4 text-white">
+                            <input id="AceptModal"
+                                class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg" type="submit"
+                                name="Accion" value="Si">
+                            <button type="button"
+                                class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg CloseModal">NO</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Categoria -->
-            <div id="Categoria" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
-                <div class="flex flex-row items-center gap-4">
-                    <textarea placeholder="Descripcion"
-                        class="p-2 w-100 border-black border-2 rounded-lg resize-none CATOBJ"></textarea>
-                </div>
-            </div>
-
-
-            <!-- Agregar imagen-->
-            <div id="Imagen" class="flex flex-row p-2 items-center gap-4 hidden">
-                <input type="file" accept="image/*" id="fileInput" class="hidden PDTOBJ CATOBJ">
-                <input type="text" value="" class="hidden">
-                <button onclick="document.getElementById('fileInput').click()" type="button"
-                    class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
-                    Imagen</button>
-                <div id="preview" class="w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
-                    <span class="cursor-default text-gray-500">Vista previa de la imagen</span>
-                </div>
-                <!-- Botones-->
-                <div class="flex flex-col items-center gap-4">
-                    <input id="Guardar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
-                        type="button" value="Guardar">
-                    <input id="Buscar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
-                        type="button" value="Buscar">
-                    <input
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
-                        type="button" value="Eliminar">
-                    <input
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
-                        type="button" value="Actualizar">
-                </div>
-            </div>
-
+            </form>
         </div>
-
-        <!-- Modal-->
-        <div id="modal" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
+        <!--Campos vacios Modal-->
+        <div id="modal3" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
             <div class="bg-white p-6 rounded-lg">
-                <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
-                <p id="M_content" class="mb-4"></p>
-                <div class="flex flex-row items-center gap-4 text-white">
-                    <input id="AceptModal" class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg"
-                        type="submit" name="Accion" value="Si">
-                    <button type="button"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg CloseModal">NO</button>
-                </div>
+                <h2 class="text-2xl font-bold mb-4">Campos Vacios</h2>
+                <p class="mb-4">Por favor, complete todos los campos antes de guardar.</p>
+                <button type="button"
+                    class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal">Cerrar</button>
             </div>
-        </div>
-    </form>
-
-    <!--Campos vacios Modal-->
-    <div id="modal3" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-lg">
-            <h2 class="text-2xl font-bold mb-4">Campos Vacios</h2>
-            <p class="mb-4">Por favor, complete todos los campos antes de guardar.</p>
-            <button type="button"
-                class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal">Cerrar</button>
         </div>
     </div>
 </body>
 
+
 <script>
-var accionesSelect = document.getElementById('acciones');
-var ImagenDiv = document.getElementById('Imagen');
-var productosDiv = document.getElementById('productos');
-var categoriaDiv = document.getElementById('Categoria');
-var Editar_crearSelect = document.getElementById('Editar_crear');
-var ResetElementos = document.querySelectorAll('.PDTOBJ, .CATOBJ');
+var SButton = document.querySelectorAll(".SButton");
+var accionesSelect = document.getElementById("accionesSelect");
 
-if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-    accionesSelect.addEventListener('change',
-        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-            // Reinicia los campos de entrada cada vez que se cambia la selección
-            var selectedValue = this.value;
-            switch (selectedValue) {
-                case 'Crear':
-                    ImagenDiv.classList.add('hidden');
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Producto':
-                    ImagenDiv.classList.remove('hidden');
-                    productosDiv.classList.remove('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Categoria':
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.remove('hidden');
-                    ImagenDiv.classList.remove('hidden');
-                    break;
-                default:
-                    console.log('Opción no válida');
-            }
-
-            ResetElementos.forEach(function(element) {
-                if (!element.classList.contains('select')) {
-                    element.value = ''; // Limpia el valor de cada campo de entrada
-                }
-            });
-
-        });
-}
-
-var fileInput = document.getElementById('fileInput');
-var preview = document.getElementById('preview');
-
-if (fileInput) {
-    fileInput.addEventListener('change', function() {
-        var file = this.files[0]; //Obtiene la primera imagen seleccionada  
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = '<img src="' + e.target.result +
-                    '" class="w-full h-full object-cover rounded-lg">';
-            }
-            reader.readAsDataURL(file);
-        } else {
-            preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
-        }
-    });
-}
-
-
-
-//Si recarga pagina reiniciar select 
-window.onbeforeunload = function(e) {
-    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-};
-
-
-//funciones de los botones de accion
-//Funciones del modal
-var ActionButtons = document.querySelectorAll('.Action-B');
-var M_Title = document.getElementById('M_Title');
-var M_Content = document.getElementById('M_content');
-var AceptModalButton = document.getElementById('AceptModal');
-
-ActionButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
-        // Validar campos vacíos
-
-        if (accionesSelect.value === "Producto") {
-            var ElementosPDTOBJ = document.querySelectorAll('.PDTOBJ');
-        } else if (accionesSelect.value === "Categoria") {
-            var ElementosPDTOBJ = document.querySelectorAll('.CATOBJ');
-        } else {
-            var ElementosPDTOBJ = [];
-        }
-
-        var vacio = false
-
-        for (const elemento of ElementosPDTOBJ) {
-            if (elemento.value.trim() === '') {
-                Modal3.classList.remove('hidden'); // Muestra el modal de campos vacíos
-                vacio = true
-                break;
-            }
-        }
-
-        if (!vacio) {
-            Modal.classList.remove('hidden'); // Muestra el modal de confirmación
-            M_Title.value = button.value + " " + accionesSelect
-                .value; // Cambia el título del modal según el botón de acción presionado
-            M_Content.textContent = "¿Esta seguro de " + button
-                .value + " " + accionesSelect.value +
-                " ?"; //Cambia el texto segun la seleccion
-            AceptModalButton.value = button
-                .value; // Cambia el valor del botón de aceptar según el botón de acción presionado}
-        }
+SButton.forEach(function(SBvalue) {
+    SBvalue.addEventListener("click", function() {
+        accionesSelect.value = SBvalue.value.replace(/\s+/g, '');
     });
 });
 </script>
-
 <script src="js/General.js"></script>
 
 </html>

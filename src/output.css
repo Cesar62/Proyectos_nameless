@@ -245,9 +245,6 @@
   .mt-8 {
     margin-top: calc(var(--spacing) * 8);
   }
-  .mr-2 {
-    margin-right: calc(var(--spacing) * 2);
-  }
   .mr-10 {
     margin-right: calc(var(--spacing) * 10);
   }
@@ -339,6 +336,9 @@
   .w-10 {
     width: calc(var(--spacing) * 10);
   }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
   .w-30 {
     width: calc(var(--spacing) * 30);
   }
@@ -357,14 +357,29 @@
   .w-64 {
     width: calc(var(--spacing) * 64);
   }
+  .w-65 {
+    width: calc(var(--spacing) * 65);
+  }
+  .w-70 {
+    width: calc(var(--spacing) * 70);
+  }
   .w-80 {
     width: calc(var(--spacing) * 80);
   }
   .w-100 {
     width: calc(var(--spacing) * 100);
   }
+  .w-650 {
+    width: calc(var(--spacing) * 650);
+  }
+  .w-\[10\%\] {
+    width: 10%;
+  }
   .w-\[15\%\] {
     width: 15%;
+  }
+  .w-\[25\%\] {
+    width: 25%;
   }
   .w-\[50\%\] {
     width: 50%;
@@ -395,6 +410,9 @@
   }
   .basis-\[60\%\] {
     flex-basis: 60%;
+  }
+  .basis-auto {
+    flex-basis: auto;
   }
   .basis-full {
     flex-basis: 100%;
@@ -453,9 +471,6 @@
   .justify-start {
     justify-content: flex-start;
   }
-  .justify-items-end {
-    justify-items: end;
-  }
   .gap-1 {
     gap: calc(var(--spacing) * 1);
   }
@@ -470,18 +485,6 @@
   }
   .gap-8 {
     gap: calc(var(--spacing) * 8);
-  }
-  .place-self-end {
-    place-self: end;
-  }
-  .self-center {
-    align-self: center;
-  }
-  .self-center-safe {
-    align-self: safe center;
-  }
-  .justify-self-end {
-    justify-self: flex-end;
   }
   .overflow-hidden {
     overflow: hidden;
@@ -509,10 +512,6 @@
     border-top-right-radius: var(--radius-lg);
   }
   .border {
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-  }
-  .border-1 {
     border-style: var(--tw-border-style);
     border-width: 1px;
   }
@@ -570,9 +569,6 @@
   }
   .bg-green-600 {
     background-color: var(--color-green-600);
-  }
-  .bg-green-900 {
-    background-color: var(--color-green-900);
   }
   .bg-red-500 {
     background-color: var(--color-red-500);
@@ -757,20 +753,6 @@
   .delay-50 {
     transition-delay: 50ms;
   }
-  .delay-100 {
-    transition-delay: 100ms;
-  }
-  .delay-150 {
-    transition-delay: 150ms;
-  }
-  .duration-100 {
-    --tw-duration: 100ms;
-    transition-duration: 100ms;
-  }
-  .duration-150 {
-    --tw-duration: 150ms;
-    transition-duration: 150ms;
-  }
   .duration-200 {
     --tw-duration: 200ms;
     transition-duration: 200ms;
@@ -778,10 +760,6 @@
   .duration-300 {
     --tw-duration: 300ms;
     transition-duration: 300ms;
-  }
-  .duration-2000 {
-    --tw-duration: 2000ms;
-    transition-duration: 2000ms;
   }
   .block-50 {
     block-size: calc(var(--spacing) * 50);
@@ -915,32 +893,6 @@
         --tw-drop-shadow: var(--tw-drop-shadow-size);
         filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
       }
-    }
-  }
-  .focus\:scale-50 {
-    &:focus {
-      --tw-scale-x: 50%;
-      --tw-scale-y: 50%;
-      --tw-scale-z: 50%;
-      scale: var(--tw-scale-x) var(--tw-scale-y);
-    }
-  }
-  .focus\:scale-70 {
-    &:focus {
-      --tw-scale-x: 70%;
-      --tw-scale-y: 70%;
-      --tw-scale-z: 70%;
-      scale: var(--tw-scale-x) var(--tw-scale-y);
-    }
-  }
-  .focus\:bg-blue-600 {
-    &:focus {
-      background-color: var(--color-blue-600);
-    }
-  }
-  .active\:bg-blue-600 {
-    &:active {
-      background-color: var(--color-blue-600);
     }
   }
   .md\:visible {
