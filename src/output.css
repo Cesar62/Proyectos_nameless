@@ -339,6 +339,9 @@
   .w-10 {
     width: calc(var(--spacing) * 10);
   }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
+  }
   .w-30 {
     width: calc(var(--spacing) * 30);
   }
@@ -357,14 +360,29 @@
   .w-64 {
     width: calc(var(--spacing) * 64);
   }
+  .w-65 {
+    width: calc(var(--spacing) * 65);
+  }
+  .w-70 {
+    width: calc(var(--spacing) * 70);
+  }
   .w-80 {
     width: calc(var(--spacing) * 80);
   }
   .w-100 {
     width: calc(var(--spacing) * 100);
   }
+  .w-650 {
+    width: calc(var(--spacing) * 650);
+  }
+  .w-\[10\%\] {
+    width: 10%;
+  }
   .w-\[15\%\] {
     width: 15%;
+  }
+  .w-\[25\%\] {
+    width: 25%;
   }
   .w-\[50\%\] {
     width: 50%;
@@ -395,6 +413,9 @@
   }
   .basis-\[60\%\] {
     flex-basis: 60%;
+  }
+  .basis-auto {
+    flex-basis: auto;
   }
   .basis-full {
     flex-basis: 100%;
@@ -915,32 +936,6 @@
         --tw-drop-shadow: var(--tw-drop-shadow-size);
         filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
       }
-    }
-  }
-  .focus\:scale-50 {
-    &:focus {
-      --tw-scale-x: 50%;
-      --tw-scale-y: 50%;
-      --tw-scale-z: 50%;
-      scale: var(--tw-scale-x) var(--tw-scale-y);
-    }
-  }
-  .focus\:scale-70 {
-    &:focus {
-      --tw-scale-x: 70%;
-      --tw-scale-y: 70%;
-      --tw-scale-z: 70%;
-      scale: var(--tw-scale-x) var(--tw-scale-y);
-    }
-  }
-  .focus\:bg-blue-600 {
-    &:focus {
-      background-color: var(--color-blue-600);
-    }
-  }
-  .active\:bg-blue-600 {
-    &:active {
-      background-color: var(--color-blue-600);
     }
   }
   .md\:visible {
