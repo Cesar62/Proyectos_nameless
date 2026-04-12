@@ -1,3 +1,7 @@
+<?php
+require 'Config/BD.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
