@@ -2,6 +2,7 @@
 var Modal = document.getElementById("modal");
 var Modal2 = document.getElementById("modal2");
 var Modal3 = document.getElementById("modal3");
+var modalInfo = document.getElementById("modalInfo");
 
 //funciones de los botones de accion espero que funcione en la mayoria de formularios
 //Funciones del modal
@@ -49,4 +50,10 @@ closeModalButton.forEach(function (button) {
     if (Modal2) Modal2.classList.add("hidden"); // Oculta el modal2
     if (Modal3) Modal3.classList.add("hidden"); // Oculta el modal3
   });
+});
+
+//Modal de informacion y cerrar sesion
+var usrlogo = document.getElementById("user_lg");
+usrlogo.addEventListener("click", function() {
+    modalInfo.classList.toggle("hidden");
 });

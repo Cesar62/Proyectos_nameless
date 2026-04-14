@@ -5,11 +5,13 @@ session_start();
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
+$Login_Fallo = false;  //para cuando no se valide la informacion al loguearse
+$Mensaje = ""; //global para mostrar mensajes cuando sea necesario
 
-if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
-    $btn = isset($_POST["btn"]) ? trim($_POST["btn"]) : "";  
-    
-    if($btn === "Iniciar Sesion"){ //funciones para login
+if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
+    $btn = isset($_POST["btn"]) ? trim($_POST["btn"]) : "";
+
+    if ($btn === "Iniciar Sesion") { //funciones para login
         $correo = trim($_POST["email"]);
         $contra = trim($_POST["password"]);
 
@@ -18,12 +20,30 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
         $sql->execute();
         $login = $sql->fetch(PDO::FETCH_ASSOC); //Guardamos los datos de los campos del usuario y los guardamos en un array
 
-        if($login){
-            $_SESSION["SESION_E"] = [
-             "Sesion" => true  
-            ];
+        if ($login) {
+            if (password_verify($contra, $login["Contraseña"])) { // en password verify se pasa primero la contraseña que escribe el usuario luego se pasa la de la base de datos
+                $_SESSION["SESION_E"] = [
+                    "Sesion" => true,
+                    "Sesion_Info" => $login
+                ];
+
+                $Empleado_Info = $login; // actualizar información del empleado en esta carga
+                $Session_estado = true;
+            } else {
+                $Login_Fallo = true;
+                $Mensaje = "Contraseña Incorrecta";
+            }
+        } else {
+            $Login_Fallo = true;
+            $Mensaje = "Correo no encontrado";
         }
-    }   
+    }
+
+    if ($btn === "cerrar sesion") {
+        session_destroy();
+        $_SESSION = [];
+        $Session_estado = false;
+    }
 }
 
 ?>
@@ -55,7 +75,7 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
                     </path>
                 </svg>
             </button>
-            <div
+            <div id="user_lg"
                 class="w-10 h-10 hover:scale-110 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
@@ -70,7 +90,7 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-2xl font-bold mb-4">Menú</h1>
             <div class="flex flex-row flex-wrap justify-content-center gap-8">
-                <a href="Adm_tux.php"
+                <a href="Empleado_tux.php"
                     class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 overflow-hidden">
                     <div class="flex flex-col items-center justify-center gap-2 h-full overflow-y-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -97,19 +117,20 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
         </div>
     </div>
 
-    <?php if($Session_estado == false): ?>
+    <?php if ($Session_estado == false): ?>
 
     <!--Login-->
     <form id="lmodal" action="Adm_M.php" method="post"
         class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
         <div class='flex flex-col gap-4 justify-center bg-black p-6 rounded-lg text-white border-white border'>
+            <?php if($Login_Fallo == true){ echo "<div class='text-white text-xs p-2 rounded-lg bg-red-600 border border-white'><p> $Mensaje </p></div>"; }?>
             <h2 class='text-2xl font-bold mb-2'>Iniciar Sesion</h2>
             <input type="email" id="email" name="email" pattern=".+@gmail\.com" placeholder="Ingresar Correo"
                 class="p-2 border-2 border-white rounded-lg login">
             <div class="flex flex-row items-center justify-end">
                 <input id="Ipass" type="password" name="password" placeholder="ingrese contraseña"
                     class="p-2 border-2 border-white rounded-lg login">
-                <button id="btnp" class="absolute bg-white m-2 rounded-lg cursor-pointer hover:scale-110"
+                <button id="btnp" type="button" class="absolute bg-white m-2 rounded-lg cursor-pointer hover:scale-110"
                     onclick="contraseña()"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor" class="size-6 fill-black">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -122,7 +143,7 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
                 class="bg-white p-2 rounded-lg hover:scale-105 cursor-pointer text-black font-bold transition delay-50 duration-200 ">
         </div>
     </form>
-    <?php endif?>
+    <?php endif ?>
 
     <!--Campos vacios Modal-->
     <div id="modal3" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
@@ -133,13 +154,30 @@ if(!empty($_POST)){ //si llega a fallar el metod post no va a hacer nada
                 class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal">Cerrar</button>
         </div>
     </div>
+
+    <!--informacion del empleado cerrar sesion-->
+    <form action="Adm_M.php" method="post">
+        <div id="modalInfo" class="fixed inset-x-0 top-15 z-20 flex justify-end hidden">
+            <div class="flex flex-col p-2 bg-black/75 text-white text-lg items-center border border-white rounded-lg">
+                <?php if($Session_estado == true){
+                    echo "<p>" . $Empleado_Info['Nombre'] . " " . $Empleado_Info['Apellido'] . "</p>
+                    
+                        <p>" . $Empleado_Info['Cargo'] . "</p>
+                    
+                    ";
+                }?>
+                <input name="btn" type="submit" value="cerrar sesion"
+                    class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg">
+            </div>
+        </div>
+    </form>
 </body>
-<script src="js/General.js"></script>
 <script>
 //cambiar visibilidad de la contraseña
 var btnp = document.getElementById("btnp");
 var Ipass = document.getElementById("Ipass");
 var lmodal = document.getElementById("lmodal");
+
 
 function contraseña() {
     if (Ipass.type == "password") {
@@ -169,9 +207,11 @@ Lbtn.addEventListener("click", function() {
     }
 });
 
-<?php if($Session_estado == true):?>
+<?php if ($Session_estado == true): ?>
 lmodal.classList.add("hidden");
 <?php endif ?>
 </script>
+
+<script src="js/General.js"></script>
 
 </html>

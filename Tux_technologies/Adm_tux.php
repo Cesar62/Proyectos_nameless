@@ -1,5 +1,47 @@
 <?php
-include 'Config/BD.php';
+require 'Config/BD.php';
+require 'Config/funciones.php';
+
+session_start();
+
+$Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
+$Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
+
+if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
+    $btn = isset($_POST["btn"]) ? trim($_POST["btn"]) : "";
+
+    switch ($btn) {
+        case 'Registrar': //Registrar los empleados en la bd
+            $nombre = trim($_POST["nombre"]);
+            $apellido = trim($_POST["apellido"]);
+            $correo = trim($_POST["correo"]);
+            $cargo = trim($_POST["cargo"]);
+            $contra = trim($_POST["contraseña"]);
+
+
+            break;
+        case 'Buscar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si"
+            echo "Has Buscado el producto.";
+            break;
+
+        case 'Eliminar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si"
+            echo "Has Eliminado el producto.";
+            break;
+        case 'Actualizar':
+            // Aquí puedes agregar la lógica para manejar la acción de "Si" 
+            echo "Has Actualizado el producto.";
+            break;
+        // Puedes agregar más casos para otras acciones si es necesario
+        default:
+            echo "Acción no reconocida.";
+    }
+}
+
+if (!$Session_estado) {
+    header("Location: Adm_M.php");
+}
 
 ?>
 
@@ -33,7 +75,8 @@ include 'Config/BD.php';
             </button>
             <a href="Adm_M.php"
                 class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">Menu</a>
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer">
+            <div id="user_lg"
+                class="w-10 h-10 hover:scale-110 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
         </div>
@@ -56,24 +99,24 @@ include 'Config/BD.php';
             <form action="Adm_tux.php" method="post" class="flex flex-col w-[100%] gap-2 items-center">
                 <h2 class="text-xl font-bold">Registrar Nuevo Empleado</h2>
                 <div class="flex flex-row gap-2">
-                    <input type="text" placeholder="Nombre" name="Nombre"
+                    <input type="text" placeholder="Nombre" name="nombre"
                         class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
-                    <input type="text" placeholder="Apellido"
-                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
-                </div>
-                <div class="flex flex-row gap-2">
-                    <input type="text" placeholder="Correo"
-                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
-                    <input type="text" placeholder="Contraseña"
+                    <input type="text" placeholder="Apellido" name="apellido"
                         class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
                 </div>
                 <div class="flex flex-row gap-2">
-                    <select class="p-1 w-30 cursor-pointer border-black border-2 rounded-lg select">
+                    <input type="text" placeholder="Correo" name="correo"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                    <input type="text" placeholder="Contraseña" name="contraseña"
+                        class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
+                </div>
+                <div class="flex flex-row gap-2">
+                    <select name="cargo" class="p-1 w-30 cursor-pointer border-black border-2 rounded-lg select">
                         <option value="Categoria" disabled selected>Cargo</option>
                         <option value="Categoria1">Administrador</option>
                         <option value="Categoria2">Empleado</option>
                     </select>
-                    <input type="button" value="Registrar" class="p-2 w-30 border-black border-2 rounded-lg Action-B">
+                    <input type="button" value="Registrar" class="cursor-pointer hover:scale-105 p-2 w-30 bg-green-500 text-white rounded-lg border-2 border-black  hover:scale-105 Action-B">
                 </div>
                 <!-- Modal-->
                 <div id="modal" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
@@ -101,18 +144,35 @@ include 'Config/BD.php';
             </div>
         </div>
     </div>
+
+    <!--informacion del empleado cerrar sesion-->
+    <form action="Adm_M.php" method="post">
+        <div id="modalInfo" class="fixed inset-x-0 top-15 z-20 flex justify-end hidden">
+            <div class="flex flex-col p-2 bg-black/75 text-white text-lg items-center border border-white rounded-lg">
+                <?php if ($Session_estado == true) {
+                    echo "<p>" . $Empleado_Info['Nombre'] . " " . $Empleado_Info['Apellido'] . "</p>
+                    
+                        <p>" . $Empleado_Info['Cargo'] . "</p>
+                    
+                    ";
+                } ?>
+                <input name="btn" type="submit" value="cerrar sesion"
+                    class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg">
+            </div>
+        </div>
+    </form>
 </body>
 
 
 <script>
-var SButton = document.querySelectorAll(".SButton");
-var accionesSelect = document.getElementById("accionesSelect");
+    var SButton = document.querySelectorAll(".SButton");
+    var accionesSelect = document.getElementById("accionesSelect");
 
-SButton.forEach(function(SBvalue) {
-    SBvalue.addEventListener("click", function() {
-        accionesSelect.value = SBvalue.value.replace(/\s+/g, '');
+    SButton.forEach(function(SBvalue) {
+        SBvalue.addEventListener("click", function() {
+            accionesSelect.value = SBvalue.value.replace(/\s+/g, '');
+        });
     });
-});
 </script>
 <script src="js/General.js"></script>
 
