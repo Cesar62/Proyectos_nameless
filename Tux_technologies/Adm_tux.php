@@ -17,8 +17,11 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
             $correo = trim($_POST["correo"]);
             $cargo = trim($_POST["cargo"]);
             $contra = trim($_POST["contraseña"]);
+            $contraSecret = password_hash($contra,  PASSWORD_BCRYPT, ['cost' => 12]);  //cost retrasa el proceso lo que evita hackeos en lso que va probando un monton de contraseñas
 
-
+            if(registrar([$nombre, $apellido, $correo, $contraSecret, $cargo], "Empleado", ["Nombre", "Apellido", "Correo", "Contraseña", "Cargo"], $pdo)){
+                echo "No se que paso";
+            }
             break;
         case 'Buscar':
             // Aquí puedes agregar la lógica para manejar la acción de "Si"
@@ -113,20 +116,20 @@ if (!$Session_estado) {
                 <div class="flex flex-row gap-2">
                     <select name="cargo" class="p-1 w-30 cursor-pointer border-black border-2 rounded-lg select">
                         <option value="Categoria" disabled selected>Cargo</option>
-                        <option value="Categoria1">Administrador</option>
-                        <option value="Categoria2">Empleado</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Empleado">Empleado</option>
                     </select>
                     <input type="button" value="Registrar" class="cursor-pointer hover:scale-105 p-2 w-30 bg-green-500 text-white rounded-lg border-2 border-black  hover:scale-105 Action-B">
                 </div>
                 <!-- Modal-->
                 <div id="modal" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
                     <div class="bg-white p-6 rounded-lg">
-                        <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
+                        <input id="M_Title" type="text" disabled class="text-2xl font-bold mb-4" value="">
                         <p id="M_content" class="mb-4"></p>
                         <div class="flex flex-row items-center gap-4 text-white">
                             <input id="AceptModal"
                                 class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg" type="submit"
-                                name="Accion" value="Si">
+                                name="btn" value="Registrar">
                             <button type="button"
                                 class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg CloseModal">NO</button>
                         </div>
