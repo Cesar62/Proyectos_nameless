@@ -44,6 +44,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
 
 if (!$Session_estado) {
     header("Location: Adm_M.php");
+    exit();
 }
 
 ?>

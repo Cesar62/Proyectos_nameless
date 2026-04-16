@@ -40,12 +40,13 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
     }
 
     if ($btn === "cerrar sesion") {
-        session_destroy();
-        $_SESSION = [];
+        $_SESSION["SESION_E"] = [
+            "Sesion" => false,
+            "Sesion_Info" => []
+        ];
         $Session_estado = false;
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -61,6 +62,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
 </head>
 
 <body class="bg-slate-900">
+
     <!-- Navbar -->
     <nav class="flex flex-row z-10 fixed bg-black p-2 w-full text-white font-bold text-xl">
         <div class=" flex basis-full  justify-start">
@@ -84,7 +86,6 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
 
     <!-- espacio de relleno -->
     <div class="h-16"></div>
-
     <!-- Seleccion de opciones -->
     <div class="flex flex-col items-center mt-8">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
@@ -102,7 +103,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                     </div>
                 </a>
                 <a href="Adm_tux.php"
-                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 overflow-hidden">
+                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 overflow-hidden admBtn">
                     <div class="flex flex-col items-center justify-center gap-2 h-full overflow-y-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-10 h-10 flex-shrink-0">
@@ -117,13 +118,13 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
         </div>
     </div>
 
-    <?php if ($Session_estado == false): ?>
-
     <!--Login-->
     <form id="lmodal" action="Adm_M.php" method="post"
         class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
         <div class='flex flex-col gap-4 justify-center bg-black p-6 rounded-lg text-white border-white border'>
-            <?php if($Login_Fallo == true){ echo "<div class='text-white text-xs p-2 rounded-lg bg-red-600 border border-white'><p> $Mensaje </p></div>"; }?>
+            <?php if ($Login_Fallo == true) {
+                echo "<div class='text-white text-xs p-2 rounded-lg bg-red-600 border border-white'><p> $Mensaje </p></div>";
+            } ?>
             <h2 class='text-2xl font-bold mb-2'>Iniciar Sesion</h2>
             <input type="email" id="email" name="email" pattern=".+@gmail\.com" placeholder="Ingresar Correo"
                 class="p-2 border-2 border-white rounded-lg login">
@@ -143,7 +144,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                 class="bg-white p-2 rounded-lg hover:scale-105 cursor-pointer text-black font-bold transition delay-50 duration-200 ">
         </div>
     </form>
-    <?php endif ?>
+
 
     <!--Campos vacios Modal-->
     <div id="modal3" class="fixed inset-0 z-20 bg-black/75 flex items-center justify-center hidden">
@@ -159,59 +160,68 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
     <form action="Adm_M.php" method="post">
         <div id="modalInfo" class="fixed inset-x-0 top-15 z-20 flex justify-end hidden">
             <div class="flex flex-col p-2 bg-black/75 text-white text-lg items-center border border-white rounded-lg">
-                <?php if($Session_estado == true){
+                <?php if ($Session_estado == true) {
                     echo "<p>" . $Empleado_Info['Nombre'] . " " . $Empleado_Info['Apellido'] . "</p>
                     
                         <p>" . $Empleado_Info['Cargo'] . "</p>
                     
                     ";
-                }?>
+                } ?>
                 <input name="btn" type="submit" value="cerrar sesion"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg">
             </div>
         </div>
     </form>
+
 </body>
+<script src="js/General.js"></script>
 <script>
-//cambiar visibilidad de la contraseña
-var btnp = document.getElementById("btnp");
-var Ipass = document.getElementById("Ipass");
-var lmodal = document.getElementById("lmodal");
+    //cambiar visibilidad de la contraseña
+    var btnp = document.getElementById("btnp");
+    var Ipass = document.getElementById("Ipass");
+    var lmodal = document.getElementById("lmodal");
 
-
-function contraseña() {
-    if (Ipass.type == "password") {
-        Ipass.type = "text"
-    } else {
-        Ipass.type = "password"
-    }
-}
-
-//validacio de inputs vacios
-var Lbtn = document.getElementById("Lbtn");
-var input_login = document.querySelectorAll(".login");
-Lbtn.addEventListener("click", function() {
-    var vacio = false;
-
-    for (const elemento of input_login) {
-        if (elemento.value.trim() === "") {
-            Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
-            vacio = true;
-            break;
+    function contraseña() {
+        if (Ipass.type == "password") {
+            Ipass.type = "text"
+        } else {
+            Ipass.type = "password"
         }
     }
 
-    if (!vacio) {
-        Lbtn.type = "submit";
-        Lbtn.click();
-    }
-});
+    //validacio de inputs vacios
+    var Lbtn = document.getElementById("Lbtn");
+    var input_login = document.querySelectorAll(".login");
+    Lbtn.addEventListener("click", function() {
+        var vacio = false;
 
-<?php if ($Session_estado == true): ?>
-lmodal.classList.add("hidden");
-<?php endif ?>
+        for (const elemento of input_login) {
+            if (elemento.value.trim() === "") {
+                Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
+                vacio = true;
+                break;
+            }
+        }
+
+        if (!vacio) {
+            Lbtn.type = "submit";
+            Lbtn.click();
+        }
+    });
+
+    <?php if ($Session_estado == true) { //solo cuando se este logueado
+        echo "lmodal.classList.add('hidden');"; //ocultamos el login
+
+        if ($Empleado_Info['Cargo'] === "Empleado") { //Si al iniciar sesion no se es admin se bloquearan las funciones de administrador
+            echo "
+            var Admbtn = document.querySelectorAll('.admBtn'); 
+
+            Admbtn.forEach(function(classAdmBtn) {
+            classAdmBtn.classList.add('hidden');
+            });
+            "; //estuve un monton haciendo que funcione esto
+        }
+    } ?>
 </script>
-
-<script src="js/General.js"></script>
 
 </html>

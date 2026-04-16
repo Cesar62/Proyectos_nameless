@@ -1,5 +1,11 @@
 <?php
-include 'Config/BD.php';
+require 'Config/BD.php';
+
+session_start();
+
+$Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
+$Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
+$var = false;
 
 $btn = $_POST['Accion'] ?? null;
 $Acciones = $_POST['acciones'] ?? "Error";
@@ -34,7 +40,7 @@ if ($btn) {
         default:
             echo "Acción no reconocida.";
     }
-    
+
 
     echo "
         <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
@@ -45,6 +51,11 @@ if ($btn) {
             </div>
         </div>
     ";
+}
+
+if (!$Session_estado) {
+    header("Location: Adm_M.php");
+    exit();
 }
 ?>
 
@@ -188,70 +199,70 @@ if ($btn) {
 </body>
 
 <script>
-var accionesSelect = document.getElementById('acciones');
-var ImagenDiv = document.getElementById('Imagen');
-var productosDiv = document.getElementById('productos');
-var categoriaDiv = document.getElementById('Categoria');
-var Editar_crearSelect = document.getElementById('Editar_crear');
-var ResetElementos = document.querySelectorAll('.Productos, .Categoria');
+    var accionesSelect = document.getElementById('acciones');
+    var ImagenDiv = document.getElementById('Imagen');
+    var productosDiv = document.getElementById('productos');
+    var categoriaDiv = document.getElementById('Categoria');
+    var Editar_crearSelect = document.getElementById('Editar_crear');
+    var ResetElementos = document.querySelectorAll('.Productos, .Categoria');
 
-if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-    accionesSelect.addEventListener('change',
-        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-            // Reinicia los campos de entrada cada vez que se cambia la selección
-            var selectedValue = this.value;
-            switch (selectedValue) {
-                case 'Crear':
-                    ImagenDiv.classList.add('hidden');
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Producto':
-                    ImagenDiv.classList.remove('hidden');
-                    productosDiv.classList.remove('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Categoria':
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.remove('hidden');
-                    ImagenDiv.classList.remove('hidden');
-                    break;
-                default:
-                    console.log('Opción no válida');
-            }
-
-            ResetElementos.forEach(function(element) {
-                if (!element.classList.contains('select')) {
-                    element.value = ''; // Limpia el valor de cada campo de entrada
+    if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
+        accionesSelect.addEventListener('change',
+            function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+                // Reinicia los campos de entrada cada vez que se cambia la selección
+                var selectedValue = this.value;
+                switch (selectedValue) {
+                    case 'Crear':
+                        ImagenDiv.classList.add('hidden');
+                        productosDiv.classList.add('hidden');
+                        categoriaDiv.classList.add('hidden');
+                        break;
+                    case 'Producto':
+                        ImagenDiv.classList.remove('hidden');
+                        productosDiv.classList.remove('hidden');
+                        categoriaDiv.classList.add('hidden');
+                        break;
+                    case 'Categoria':
+                        productosDiv.classList.add('hidden');
+                        categoriaDiv.classList.remove('hidden');
+                        ImagenDiv.classList.remove('hidden');
+                        break;
+                    default:
+                        console.log('Opción no válida');
                 }
+
+                ResetElementos.forEach(function(element) {
+                    if (!element.classList.contains('select')) {
+                        element.value = ''; // Limpia el valor de cada campo de entrada
+                    }
+                });
+
             });
+    }
 
-        });
-}
+    var fileInput = document.getElementById('fileInput');
+    var preview = document.getElementById('preview');
 
-var fileInput = document.getElementById('fileInput');
-var preview = document.getElementById('preview');
-
-if (fileInput) {
-    fileInput.addEventListener('change', function() {
-        var file = this.files[0]; //Obtiene la primera imagen seleccionada  
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = '<img src="' + e.target.result +
-                    '" class="w-full h-full object-cover rounded-lg">';
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            var file = this.files[0]; //Obtiene la primera imagen seleccionada  
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result +
+                        '" class="w-full h-full object-cover rounded-lg">';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
             }
-            reader.readAsDataURL(file);
-        } else {
-            preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
-        }
-    });
-}
+        });
+    }
 
-//Si recarga pagina reiniciar select 
-window.onbeforeunload = function(e) {
-    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-};
+    //Si recarga pagina reiniciar select 
+    window.onbeforeunload = function(e) {
+        accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+    };
 </script>
 
 <script src="js/General.js"></script>
