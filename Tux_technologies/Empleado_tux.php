@@ -9,13 +9,40 @@ $var = false;
 
 $btn = $_POST['Accion'] ?? null;
 $Acciones = $_POST['acciones'] ?? "Error";
-
+$errors = [];
 if ($btn) {
     switch ($btn) {
-        case 'Guardar':
+        case 'Guardar': //Guardar en la bd
             if ($Acciones == "Producto") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para Producto
-                echo "Has Guardado el producto.";
+                $nombre = trim($_POST("Nombre"));
+                $precio = trim($_POST("Precio"));
+                $categoria = trim($_POST("Categoria"));
+                $marca = trim($_POST("Marca"));
+                $cantidad = trim($_POST("Cantidad"));
+
+                //obtener imagen
+                if (isset($_POST["img"])) { //Esto lo agregue ya que antes en la consulta mostraba el error de subi imagen aunque estuviera ahi
+                    // Validar si se subió un archivo
+                    if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {  //Igual que post $_FILES Permite la subida de imagenes o otros archivos
+                        $directorio = "uploads/"; //Declaración de la variable que almacenala carpeta donde e almacenaran las imagenes
+
+                        if (!is_dir($directorio)) { //En caso de que no exista la carpeta para las imagenes se crea una
+                            mkdir($directorio, 0777, true); //Cn mkdir se pueden crear carpetas le pasaos el nombre dela carpeta, los maximos permisos, Conlo ultimo cualquier carpeta que se cree dentro tendra los msmo permisos
+                        }
+
+                        $nombre_imagen = basename($_FILES['img']['name']);  //almacenamos el nombre de la imagen subida 
+                        $ruta_destino = $directorio . uniqid() . "_" . $nombre_imagen;
+                        //Almacenamos la rta de destino con el direcorio un id irrepetible y el nombre de la imagen
+
+                        if (move_uploaded_file($_FILES['img']['tmp_name'], $ruta_destino)) { //Con este metodo podemos mver la imagen subida a la carpetade imagenes
+                            $foto_ruta = $ruta_destino; //Creados la variable con la ruta final de la imagen
+                        } else {
+                            $errors[] = "Error al subir la imagen";
+                        }
+                    } else {
+                        $errors[] = "Debe subir una imagen";
+                    }
+                }
             } elseif ($Acciones == "Categoria") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para Categoria
                 echo "Has Guardado la categoria.";
@@ -118,9 +145,9 @@ if (!$Session_estado) {
             </div>
             <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Precio" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
+                    <input type="text" placeholder="Precio" name="Precio" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
-                    <select class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
+                    <select name="Categoria" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
                         <option value="Categoria" disabled selected>Categoria</option>
                         <option value="Categoria1">Categoria 1</option>
                         <option value="Categoria2">Categoria 2</option>
@@ -128,8 +155,8 @@ if (!$Session_estado) {
                     </select>
                 </div>
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Marca" class="p-2 border-black border-2 rounded-lg Producto">
-                    <input type="text" placeholder="cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
+                    <input type="text" placeholder="Marca" name="Marca" class="p-2 border-black border-2 rounded-lg Producto">
+                    <input type="text" placeholder="cantidad" name="Cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 w-60 border-black border-2 rounded-lg appearance-none Producto">
                 </div>
             </div>
@@ -145,7 +172,7 @@ if (!$Session_estado) {
 
             <!-- Agregar imagen-->
             <div id="Imagen" class="flex flex-row p-2 items-center gap-4 hidden">
-                <input type="file" accept="image/*" id="fileInput" class="hidden Producto Categoria">
+                <input type="file" accept="image/*" name="img" id="fileInput" class="hidden Producto Categoria">
                 <input type="text" value="" class="hidden">
                 <button onclick="document.getElementById('fileInput').click()" type="button"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
