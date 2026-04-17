@@ -5,7 +5,7 @@ session_start();
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
-$var = false;
+$modal = false;
 
 $btn = $_POST['Accion'] ?? null;
 $Acciones = $_POST['acciones'] ?? "Error";
@@ -14,16 +14,20 @@ if ($btn) {
     switch ($btn) {
         case 'Guardar': //Guardar en la bd
             if ($Acciones == "Producto") {
-                $nombre = trim($_POST("Nombre"));
-                $precio = trim($_POST("Precio"));
-                $categoria = trim($_POST("Categoria"));
-                $marca = trim($_POST("Marca"));
-                $cantidad = trim($_POST("Cantidad"));
+                echo "Detectado";
+
+                /*
+                $nombre = trim($_POST["Nombre"]);
+                $precio = trim($_POST["Precio"]);
+                $categoria = trim($_POST["Categoria"]);
+                $marca = trim($_POST["Marca"]);
+                $cantidad = trim($_POST["Cantidad"]);
+                $foto_ruta = "";
 
                 //obtener imagen
                 if (isset($_POST["img"])) { //Esto lo agregue ya que antes en la consulta mostraba el error de subi imagen aunque estuviera ahi
                     // Validar si se subió un archivo
-                    if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {  //Igual que post $_FILES Permite la subida de imagenes o otros archivos
+                    if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {  //Igual que $_POST $_FILES Permite la subida de imagenes o otros archivos
                         $directorio = "uploads/"; //Declaración de la variable que almacenala carpeta donde e almacenaran las imagenes
 
                         if (!is_dir($directorio)) { //En caso de que no exista la carpeta para las imagenes se crea una
@@ -43,12 +47,26 @@ if ($btn) {
                         $errors[] = "Debe subir una imagen";
                     }
                 }
+
+                if (vacio([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta])) {
+                    $errors[] = "Campos incompletos";
+                }
+
+                if (count($errors) == 0) {
+                    if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "productos", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
+                        $modal = true;
+                    }else {
+                        $errors[] = "Error al guardar el producto en la base de datos";
+                    }
+                }
             } elseif ($Acciones == "Categoria") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para Categoria
                 echo "Has Guardado la categoria.";
             } else {
                 echo "Acción no reconocida para Guardar.";
-            }
+                */
+            } 
+            
             break;
         case 'Buscar':
             // Aquí puedes agregar la lógica para manejar la acción de "Si"
@@ -68,16 +86,28 @@ if ($btn) {
             echo "Acción no reconocida.";
     }
 
-
-    echo "
-        <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
-            <div class='bg-white p-6 rounded-lg'>
-                <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
-                <p class='mb-4'>$btn $Acciones con exito</p>
-                <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
+    if ($modal) {
+        echo "
+            <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
+                <div class='bg-white p-6 rounded-lg'>
+                    <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
+                    <p class='mb-4'>$btn $Acciones con exito</p>
+                    <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
+                </div>
             </div>
-        </div>
-    ";
+        ";
+    } else if (count($errors) > 0) {
+        $errorMessages = implode("<br>", $errors);
+        echo "
+            <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
+                <div class='bg-white p-6 rounded-lg'>
+                    <h2 class='text-2xl font-bold mb-4'>Errores encontrados</h2>
+                    <p class='mb-4'>$errorMessages</p>
+                    <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
+                </div>
+            </div>
+        ";
+    }
 }
 
 if (!$Session_estado) {
@@ -114,13 +144,8 @@ if (!$Session_estado) {
                     </path>
                 </svg>
             </button>
-            <a href="#Inicio"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">INICIO</a>
-            <a href="#Producto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">PRODUCTOS</a>
-            <a href="#Contacto"
-                class="hover:text-gray-600 hover:bg-white rounded-lg p-2 md:visible invisible md:inline-block hidden">CONTACTO</a>
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center cursor-pointer">
+            <div id="user_lg"
+                class="w-10 h-10 hover:scale-110 bg-white rounded-full flex items-center justify-center cursor-pointer">
                 <img src="imagenes/iconos/icono_persona.svg">
             </div>
         </div>
@@ -131,7 +156,7 @@ if (!$Session_estado) {
 
 
     <!-- Menu del Empleado -->
-    <form action="Adm_tux.php" method="post" class="flex flex-col items-center mt-8">
+    <form action="Empleado_tux.php" method="post" class="flex flex-col items-center mt-8">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Empleado</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
@@ -205,8 +230,8 @@ if (!$Session_estado) {
                 <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
                 <p id="M_content" class="mb-4"></p>
                 <div class="flex flex-row items-center gap-4 text-white">
-                    <input id="AceptModal" class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg"
-                        type="submit" name="Accion" value="Si">
+                    <input id="AceptModal" onclick="AceptModalButtonSubmit()" class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg"
+                        type="button" name="Accion" value="Si">
                     <button type="button"
                         class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg CloseModal">NO</button>
                 </div>
@@ -223,8 +248,24 @@ if (!$Session_estado) {
                 class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal">Cerrar</button>
         </div>
     </div>
-</body>
 
+    <!--informacion del empleado cerrar sesion-->
+    <form action="Adm_M.php" method="post">
+        <div id="modalInfo" class="fixed inset-x-0 top-15 z-20 flex justify-end hidden">
+            <div class="flex flex-col p-2 bg-black/75 text-white text-lg items-center border border-white rounded-lg">
+                <?php if ($Session_estado == true) {
+                    echo "<p>" . $Empleado_Info['Nombre'] . " " . $Empleado_Info['Apellido'] . "</p>
+                    
+                        <p>" . $Empleado_Info['Cargo'] . "</p>
+                    
+                    ";
+                } ?>
+                <input name="btn" type="submit" value="cerrar sesion"
+                    class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg">
+            </div>
+        </div>
+    </form>
+</body>
 <script>
     var accionesSelect = document.getElementById('acciones');
     var ImagenDiv = document.getElementById('Imagen');
@@ -290,8 +331,13 @@ if (!$Session_estado) {
     window.onbeforeunload = function(e) {
         accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
     };
+
+    var AceptModalButton = document.getElementById("AceptModal");
+    function AceptModalButtonSubmit(){
+        var AceptModalButton = document.getElementById("AceptModal");
+        AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
+        AceptModalButton.click();
+    }
 </script>
-
 <script src="js/General.js"></script>
-
 </html>

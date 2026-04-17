@@ -10,6 +10,9 @@ function registrar(array $datos, string $tablabd, array $campos, PDO $pdo){
 
     $sql = "INSERT INTO $tablabd ($columnas) VALUES ($placeholders)";
 
+    echo $sql;
+
+    /*
     $stm = $pdo->prepare($sql);
 
     if($stm->execute(array_values($datos))){ //le pasamos la informacion que vamos a ingresar en la base
@@ -17,5 +20,17 @@ function registrar(array $datos, string $tablabd, array $campos, PDO $pdo){
     } else {
         print_r($stm->errorInfo());
     }
+    */
 }
+
+//Esto va a servir para que el usuario no envie datos vacios en la base
+function vacio(array $parametros){
+     foreach($parametros as $parametro){ //foreach Recorre todos los elementos del array
+       if(strlen(trim($parametro)) < 1){ //Strlen cuenta el tamaño del texto 
+        return true; //Si no hay texto retornamos verdadero
+     }
+    } 
+    return false;
+}
+
 ?>

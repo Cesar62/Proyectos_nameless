@@ -20,9 +20,10 @@ ActionButtons.forEach(function (button) {
 
     var vacio = false;
 
-    for (const elemento of ElementosSeccion) { 
-      if (elemento.name === "Nombre") { //encuentra el input con con el name nombre
-        var Nombre = elemento.value;  //entonces obtenemos el texto del elemento
+    for (const elemento of ElementosSeccion) {
+      if (elemento.name === "Nombre") {
+        //encuentra el input con con el name nombre
+        var Nombre = elemento.value; //entonces obtenemos el texto del elemento
       }
 
       if (elemento.value.trim() === "") {
@@ -37,7 +38,7 @@ ActionButtons.forEach(function (button) {
       M_Title.value = button.value + " " + Nombre; // Cambia el título del modal según el botón de acción presionado
       M_Content.textContent =
         "¿Esta seguro de " + button.value + " " + Nombre + " ?"; //Cambia el texto segun la seleccion
-      AceptModalButton.value = button.value; // Cambia el valor del botón de aceptar según el botón de acción presionado}
+      AceptModalButton.value = button.value; // Cambia el valor del botón de aceptar según el botón de acción presionado
     }
   });
 });
@@ -54,6 +55,6 @@ closeModalButton.forEach(function (button) {
 
 //Modal de informacion y cerrar sesion
 var usrlogo = document.getElementById("user_lg");
-usrlogo.addEventListener("click", function() {
-    modalInfo.classList.toggle("hidden");
+usrlogo.addEventListener("click", function () {
+  modalInfo.classList.toggle("hidden");
 });
