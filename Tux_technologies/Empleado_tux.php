@@ -1,12 +1,15 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require 'Config/BD.php';
+require 'Config/funciones.php';
 
 session_start();
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
-$modal = false;
-
+$modal = $_SESSION["modal"] ?? false;
+$accion = $_SESSION["Accion"] ?? "";
 $btn = $_POST['Accion'] ?? null;
 $Acciones = $_POST['acciones'] ?? "Error";
 $errors = [];
@@ -14,59 +17,55 @@ if ($btn) {
     switch ($btn) {
         case 'Guardar': //Guardar en la bd
             if ($Acciones == "Producto") {
-                echo "Detectado";
-
-                /*
-                $nombre = trim($_POST["Nombre"]);
-                $precio = trim($_POST["Precio"]);
-                $categoria = trim($_POST["Categoria"]);
-                $marca = trim($_POST["Marca"]);
-                $cantidad = trim($_POST["Cantidad"]);
+                $nombre = trim($_POST["Nombre"]) ?? "";
+                $precio = trim($_POST["Precio"]) ?? "";
+                $categoria = trim($_POST["Categoria"]) ?? "";
+                $marca = trim($_POST["Marca"]) ?? "";
+                $cantidad = trim($_POST["Cantidad"]) ?? "";
                 $foto_ruta = "";
+                $img = $_FILES['img'] ?? null;
 
-                //obtener imagen
-                if (isset($_POST["img"])) { //Esto lo agregue ya que antes en la consulta mostraba el error de subi imagen aunque estuviera ahi
-                    // Validar si se subió un archivo
-                    if (isset($_FILES['img']) && $_FILES['img']['error'] == 0) {  //Igual que $_POST $_FILES Permite la subida de imagenes o otros archivos
-                        $directorio = "uploads/"; //Declaración de la variable que almacenala carpeta donde e almacenaran las imagenes
+                // obtener imagen
+                if (!empty($img) && $img['error'] === UPLOAD_ERR_OK && is_uploaded_file($img['tmp_name'])) { // Verifica que se ha subido un archivo sin errores
+                    $directorio = "uploads/"; // Declaración de la carpeta donde se almacenarán las imágenes
 
-                        if (!is_dir($directorio)) { //En caso de que no exista la carpeta para las imagenes se crea una
-                            mkdir($directorio, 0777, true); //Cn mkdir se pueden crear carpetas le pasaos el nombre dela carpeta, los maximos permisos, Conlo ultimo cualquier carpeta que se cree dentro tendra los msmo permisos
-                        }
-
-                        $nombre_imagen = basename($_FILES['img']['name']);  //almacenamos el nombre de la imagen subida 
-                        $ruta_destino = $directorio . uniqid() . "_" . $nombre_imagen;
-                        //Almacenamos la rta de destino con el direcorio un id irrepetible y el nombre de la imagen
-
-                        if (move_uploaded_file($_FILES['img']['tmp_name'], $ruta_destino)) { //Con este metodo podemos mver la imagen subida a la carpetade imagenes
-                            $foto_ruta = $ruta_destino; //Creados la variable con la ruta final de la imagen
-                        } else {
-                            $errors[] = "Error al subir la imagen";
-                        }
-                    } else {
-                        $errors[] = "Debe subir una imagen";
+                    if (!is_dir($directorio)) {  //Si el directorio no existe se crea uno
+                        mkdir($directorio, 0777, true);
                     }
+
+                    $nombre_imagen = basename($img['name']); //USa el nombre original de la imagen
+                    $ruta_destino = $directorio . uniqid() . "_" . $nombre_imagen; // se agrega el nombre de la carptea un id unico y el nombre de la imagen
+
+                    if (move_uploaded_file($img['tmp_name'], $ruta_destino)) {
+                        $foto_ruta = $ruta_destino;
+                        $modal = true;
+                    } else {
+                        $errors[] = "Error al mover la imagen subida.";
+                    }
+                } else {
+                    $errorCode = $img['error'] ?? null;
+                    $errors[] = "Debe subir una imagen. Error de carga: " . ($errorCode !== null ? $errorCode : 'archivo no enviado');
                 }
 
                 if (vacio([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta])) {
                     $errors[] = "Campos incompletos";
-                }
-
-                if (count($errors) == 0) {
+                } else {
                     if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "productos", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
-                        $modal = true;
-                    }else {
-                        $errors[] = "Error al guardar el producto en la base de datos";
+                        $_SESSION["modal"] = true;
+                        $_SESSION["Accion"] = $btn;
+                        header("Location: Empleado_tux.php");
+                        exit();
+                    } else {
+                        $errors[] = "Error al registrar el producto en la base de datos.";
                     }
                 }
             } elseif ($Acciones == "Categoria") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para Categoria
+                $nombre = trim($_POST["Nombre"]) ?? "";
+                $descripcion = trim($_POST["Descripcion"]) ?? "";
                 echo "Has Guardado la categoria.";
             } else {
                 echo "Acción no reconocida para Guardar.";
-                */
-            } 
-            
+            }
             break;
         case 'Buscar':
             // Aquí puedes agregar la lógica para manejar la acción de "Si"
@@ -85,20 +84,22 @@ if ($btn) {
         default:
             echo "Acción no reconocida.";
     }
+}
 
-    if ($modal) {
-        echo "
+if ($modal) {
+    echo "
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
                 <div class='bg-white p-6 rounded-lg'>
                     <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
-                    <p class='mb-4'>$btn $Acciones con exito</p>
+                    <p class='mb-4'>$accion $Acciones con exito</p>
                     <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
                 </div>
             </div>
         ";
-    } else if (count($errors) > 0) {
-        $errorMessages = implode("<br>", $errors);
-        echo "
+        $_SESSION["modal"] = false;
+} else if (count($errors) > 0) {
+    $errorMessages = implode("<br>", $errors);
+    echo "
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
                 <div class='bg-white p-6 rounded-lg'>
                     <h2 class='text-2xl font-bold mb-4'>Errores encontrados</h2>
@@ -107,7 +108,6 @@ if ($btn) {
                 </div>
             </div>
         ";
-    }
 }
 
 if (!$Session_estado) {
@@ -156,11 +156,12 @@ if (!$Session_estado) {
 
 
     <!-- Menu del Empleado -->
-    <form action="Empleado_tux.php" method="post" class="flex flex-col items-center mt-8">
+    <form action="Empleado_tux.php" method="post" class="flex flex-col items-center mt-8" enctype="multipart/form-data">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Empleado</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
-                <input type="text" placeholder="Nombre" name="Nombre" class="p-2 border-black border-2 rounded-lg Producto Categoria">
+                <input type="text" placeholder="Nombre" name="Nombre"
+                    class="p-2 border-black border-2 rounded-lg Producto Categoria">
                 <select id="acciones" name="acciones" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg"
                     required>
                     <option value="" disabled selected>Que Desea Crear</option>
@@ -170,18 +171,21 @@ if (!$Session_estado) {
             </div>
             <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Precio" name="Precio" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
+                    <input type="text" placeholder="Precio" name="Precio"
+                        oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
-                    <select name="Categoria" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
-                        <option value="Categoria" disabled selected>Categoria</option>
+                    <select name="Categoria"
+                        class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
                         <option value="Categoria1">Categoria 1</option>
                         <option value="Categoria2">Categoria 2</option>
                         <option value="Categoria3">Categoria 3</option>
                     </select>
                 </div>
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Marca" name="Marca" class="p-2 border-black border-2 rounded-lg Producto">
-                    <input type="text" placeholder="cantidad" name="Cantidad" oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
+                    <input type="text" placeholder="Marca" name="Marca"
+                        class="p-2 border-black border-2 rounded-lg Producto">
+                    <input type="text" placeholder="cantidad" name="Cantidad"
+                        oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 w-60 border-black border-2 rounded-lg appearance-none Producto">
                 </div>
             </div>
@@ -230,8 +234,9 @@ if (!$Session_estado) {
                 <input id="M_Title" type="text" class="text-2xl font-bold mb-4" value="">
                 <p id="M_content" class="mb-4"></p>
                 <div class="flex flex-row items-center gap-4 text-white">
-                    <input id="AceptModal" onclick="AceptModalButtonSubmit()" class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg"
-                        type="button" name="Accion" value="Si">
+                    <input id="AceptModal" onclick="AceptModalButtonSubmit()"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 bg-green-500 rounded-lg" type="button"
+                        name="Accion" value="Si">
                     <button type="button"
                         class="cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-red rounded-lg CloseModal">NO</button>
                 </div>
@@ -267,77 +272,79 @@ if (!$Session_estado) {
     </form>
 </body>
 <script>
-    var accionesSelect = document.getElementById('acciones');
-    var ImagenDiv = document.getElementById('Imagen');
-    var productosDiv = document.getElementById('productos');
-    var categoriaDiv = document.getElementById('Categoria');
-    var Editar_crearSelect = document.getElementById('Editar_crear');
-    var ResetElementos = document.querySelectorAll('.Productos, .Categoria');
+var accionesSelect = document.getElementById('acciones');
+var ImagenDiv = document.getElementById('Imagen');
+var productosDiv = document.getElementById('productos');
+var categoriaDiv = document.getElementById('Categoria');
+var Editar_crearSelect = document.getElementById('Editar_crear');
+var ResetElementos = document.querySelectorAll('.Productos, .Categoria');
 
-    if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-        accionesSelect.addEventListener('change',
-            function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-                // Reinicia los campos de entrada cada vez que se cambia la selección
-                var selectedValue = this.value;
-                switch (selectedValue) {
-                    case 'Crear':
-                        ImagenDiv.classList.add('hidden');
-                        productosDiv.classList.add('hidden');
-                        categoriaDiv.classList.add('hidden');
-                        break;
-                    case 'Producto':
-                        ImagenDiv.classList.remove('hidden');
-                        productosDiv.classList.remove('hidden');
-                        categoriaDiv.classList.add('hidden');
-                        break;
-                    case 'Categoria':
-                        productosDiv.classList.add('hidden');
-                        categoriaDiv.classList.remove('hidden');
-                        ImagenDiv.classList.remove('hidden');
-                        break;
-                    default:
-                        console.log('Opción no válida');
-                }
-
-                ResetElementos.forEach(function(element) {
-                    if (!element.classList.contains('select')) {
-                        element.value = ''; // Limpia el valor de cada campo de entrada
-                    }
-                });
-
-            });
-    }
-
-    var fileInput = document.getElementById('fileInput');
-    var preview = document.getElementById('preview');
-
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            var file = this.files[0]; //Obtiene la primera imagen seleccionada  
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result +
-                        '" class="w-full h-full object-cover rounded-lg">';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
+if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
+    accionesSelect.addEventListener('change',
+        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+            // Reinicia los campos de entrada cada vez que se cambia la selección
+            var selectedValue = this.value;
+            switch (selectedValue) {
+                case 'Crear':
+                    ImagenDiv.classList.add('hidden');
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    break;
+                case 'Producto':
+                    ImagenDiv.classList.remove('hidden');
+                    productosDiv.classList.remove('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    break;
+                case 'Categoria':
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.remove('hidden');
+                    ImagenDiv.classList.remove('hidden');
+                    break;
+                default:
+                    console.log('Opción no válida');
             }
+
+            ResetElementos.forEach(function(element) {
+                if (!element.classList.contains('select')) {
+                    element.value = ''; // Limpia el valor de cada campo de entrada
+                }
+            });
+
         });
-    }
+}
 
-    //Si recarga pagina reiniciar select 
-    window.onbeforeunload = function(e) {
-        accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-    };
+var fileInput = document.getElementById('fileInput');
+var preview = document.getElementById('preview');
 
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        var file = this.files[0]; //Obtiene la primera imagen seleccionada  
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result +
+                    '" class="w-full h-full object-cover rounded-lg">';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
+        }
+    });
+}
+
+//Si recarga pagina reiniciar select 
+window.onbeforeunload = function(e) {
+    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+};
+
+var AceptModalButton = document.getElementById("AceptModal");
+
+function AceptModalButtonSubmit() {
     var AceptModalButton = document.getElementById("AceptModal");
-    function AceptModalButtonSubmit(){
-        var AceptModalButton = document.getElementById("AceptModal");
-        AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
-        AceptModalButton.click();
-    }
+    AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
+    AceptModalButton.click();
+}
 </script>
 <script src="js/General.js"></script>
+
 </html>

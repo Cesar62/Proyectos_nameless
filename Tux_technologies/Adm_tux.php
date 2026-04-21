@@ -6,21 +6,27 @@ session_start();
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
-
+$modal = $_SESSION["modal"] ?? false;
+$errors = [];
+$accion = $_SESSION["Accion"] ?? "";
+$Acciones = $_POST['acciones'] ?? "Error";
 if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
     $btn = isset($_POST["btn"]) ? trim($_POST["btn"]) : "";
 
     switch ($btn) {
         case 'Registrar': //Registrar los empleados en la bd
-            $nombre = trim($_POST["nombre"]);
+            $nombre = trim($_POST["Nombre"]);
             $apellido = trim($_POST["apellido"]);
             $correo = trim($_POST["correo"]);
             $cargo = trim($_POST["cargo"]);
             $contra = trim($_POST["contraseña"]);
             $contraSecret = password_hash($contra,  PASSWORD_BCRYPT, ['cost' => 12]);  //cost retrasa el proceso lo que evita hackeos en lso que va probando un monton de contraseñas
 
-            if(registrar([$nombre, $apellido, $correo, $contraSecret, $cargo], "Empleado", ["Nombre", "Apellido", "Correo", "Contraseña", "Cargo"], $pdo)){
-                echo "No se que paso";
+            if (registrar([$nombre, $apellido, $correo, $contraSecret, $cargo], "Empleado", ["Nombre", "Apellido", "Correo", "Contraseña", "Cargo"], $pdo)) {
+                $_SESSION["modal"] = true;
+                $_SESSION["Accion"] = $btn;
+                header("Location: Adm_tux.php");
+                exit();
             }
             break;
         case 'Buscar':
@@ -40,6 +46,30 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
         default:
             echo "Acción no reconocida.";
     }
+}
+
+if ($modal) {
+    echo "
+            <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
+                <div class='bg-white p-6 rounded-lg'>
+                    <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
+                    <p class='mb-4'>$accion $Acciones con exito</p>
+                    <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
+                </div>
+            </div>
+        ";
+    $_SESSION["modal"] = false;
+} else if (count($errors) > 0) {
+    $errorMessages = implode("<br>", $errors);
+    echo "
+            <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
+                <div class='bg-white p-6 rounded-lg'>
+                    <h2 class='text-2xl font-bold mb-4'>Errores encontrados</h2>
+                    <p class='mb-4'>$errorMessages</p>
+                    <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
+                </div>
+            </div>
+        ";
 }
 
 if (!$Session_estado) {
@@ -98,12 +128,12 @@ if (!$Session_estado) {
                     class="p-1 border border-black rounded-lg cursor-pointer hover:scale-105 SButton">
                 <input type="button" value="Lista de Empleados"
                     class="p-1 border border-black rounded-lg cursor-pointer hover:scale-105 SButton">
-                <input id="accionesSelect" type="text" class="hidden" value="RegistrarEmpleados">
             </div>
             <form action="Adm_tux.php" method="post" class="flex flex-col w-[100%] gap-2 items-center">
-                <h2 class="text-xl font-bold">Registrar Nuevo Empleado</h2>
+                <h2  class="text-xl font-bold">Registrar Nuevo Empleado</h2>
+                <input id="accionesSelect" name="acciones" type="text" class="hidden" value="RegistrarEmpleados">
                 <div class="flex flex-row gap-2">
-                    <input type="text" placeholder="Nombre" name="nombre"
+                    <input type="text" placeholder="Nombre" name="Nombre"
                         class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
                     <input type="text" placeholder="Apellido" name="apellido"
                         class="p-2 border-black border-2 rounded-lg RegistrarEmpleados">
