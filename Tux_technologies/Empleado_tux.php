@@ -11,8 +11,18 @@ $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del
 $modal = $_SESSION["modal"] ?? false;
 $accion = $_SESSION["Accion"] ?? "";
 $btn = $_POST['Accion'] ?? null;
-$Acciones = $_POST['acciones'] ?? "Error";
+$Acciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";
 $errors = [];
+$categoria = [];
+
+$sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
+
+if ($sql->execute()) {
+    $categoria = $sql->fetchAll(PDO::FETCH_COLUMN); //Guardamos los datos de los campos del usuario y los guardamos en un array
+} else {
+    $errors[] = "Error al obtener las categorias";
+}
+
 if ($btn) {
     switch ($btn) {
         case 'Guardar': //Guardar en la bd
@@ -24,6 +34,7 @@ if ($btn) {
                 $cantidad = trim($_POST["Cantidad"]) ?? "";
                 $foto_ruta = "";
                 $img = $_FILES['img'] ?? null;
+                $ruta_destino = "";
 
                 // obtener imagen
                 if (!empty($img) && $img['error'] === UPLOAD_ERR_OK && is_uploaded_file($img['tmp_name'])) { // Verifica que se ha subido un archivo sin errores
@@ -35,13 +46,7 @@ if ($btn) {
 
                     $nombre_imagen = basename($img['name']); //USa el nombre original de la imagen
                     $ruta_destino = $directorio . uniqid() . "_" . $nombre_imagen; // se agrega el nombre de la carptea un id unico y el nombre de la imagen
-
-                    if (move_uploaded_file($img['tmp_name'], $ruta_destino)) {
-                        $foto_ruta = $ruta_destino;
-                        $modal = true;
-                    } else {
-                        $errors[] = "Error al mover la imagen subida.";
-                    }
+                    $foto_ruta = $ruta_destino;
                 } else {
                     $errorCode = $img['error'] ?? null;
                     $errors[] = "Debe subir una imagen. Error de carga: " . ($errorCode !== null ? $errorCode : 'archivo no enviado');
@@ -51,8 +56,12 @@ if ($btn) {
                     $errors[] = "Campos incompletos";
                 } else {
                     if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "productos", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
+                        if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
+                            $errors[] = "Error al mover la imagen subida.";
+                        }
                         $_SESSION["modal"] = true;
                         $_SESSION["Accion"] = $btn;
+                        $_SESSION["Acciones"] = $Acciones;
                         header("Location: Empleado_tux.php");
                         exit();
                     } else {
@@ -62,7 +71,42 @@ if ($btn) {
             } elseif ($Acciones == "Categoria") {
                 $nombre = trim($_POST["Nombre"]) ?? "";
                 $descripcion = trim($_POST["Descripcion"]) ?? "";
-                echo "Has Guardado la categoria.";
+                $foto_ruta = "";
+                $img = $_FILES['img'] ?? null;
+                $ruta_destino = "";
+
+                // obtener imagen
+                if (!empty($img) && $img['error'] === UPLOAD_ERR_OK && is_uploaded_file($img['tmp_name'])) { // Verifica que se ha subido un archivo sin errores
+                    $directorio = "uploads/"; // Declaración de la carpeta donde se almacenarán las imágenes
+
+                    if (!is_dir($directorio)) {  //Si el directorio no existe se crea uno
+                        mkdir($directorio, 0777, true);
+                    }
+
+                    $nombre_imagen = basename($img['name']); //USa el nombre original de la imagen
+                    $ruta_destino = $directorio . uniqid() . "_" . $nombre_imagen; // se agrega el nombre de la carptea un id unico y el nombre de la imagen
+                    $foto_ruta = $ruta_destino;
+                } else {
+                    $errorCode = $img['error'] ?? null;
+                    $errors[] = "Debe subir una imagen. Error de carga: " . ($errorCode !== null ? $errorCode : 'archivo no enviado');
+                }
+
+                if (vacio([$nombre, $descripcion, $foto_ruta])) {
+                    $errors[] = "Campos incompletos";
+                } else {
+                    if (registrar([$nombre, $descripcion, $foto_ruta], "productos", ["Nombre", "Descripcion", "IMG"], $pdo)) {
+                        if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
+                            $errors[] = "Error al mover la imagen subida.";
+                        }
+                        $_SESSION["modal"] = true;
+                        $_SESSION["Accion"] = $btn;
+                        $_SESSION["Acciones"] = $Acciones;
+                        header("Location: Empleado_tux.php");
+                        exit();
+                    } else {
+                        $errors[] = "Error al registrar el producto en la base de datos.";
+                    }
+                }
             } else {
                 echo "Acción no reconocida para Guardar.";
             }
@@ -96,7 +140,7 @@ if ($modal) {
                 </div>
             </div>
         ";
-        $_SESSION["modal"] = false;
+    $_SESSION["modal"] = false;
 } else if (count($errors) > 0) {
     $errorMessages = implode("<br>", $errors);
     echo "
@@ -174,12 +218,20 @@ if (!$Session_estado) {
                     <input type="text" placeholder="Precio" name="Precio"
                         oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
+                    <?php if (count($categoria) > 0): ?>
                     <select name="Categoria"
                         class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
-                        <option value="Categoria1">Categoria 1</option>
-                        <option value="Categoria2">Categoria 2</option>
-                        <option value="Categoria3">Categoria 3</option>
+                        <?php foreach ($categoria as $cat): ?>
+                        <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
+                        </option>
+                        <?php endforeach; ?>
                     </select>
+                    <?php else: ?>
+                    <select name="categoria"
+                        class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select" disabled>
+                        <option value="">No hay categorias disponibles</option>
+                    </select>
+                    <?php endif;?>
                 </div>
                 <div class="flex flex-row items-center gap-4">
                     <input type="text" placeholder="Marca" name="Marca"
