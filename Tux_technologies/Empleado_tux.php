@@ -14,6 +14,7 @@ $btn = $_POST['Accion'] ?? null;
 $Acciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";
 $errors = [];
 $categoria = [];
+$buscar = false;
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
 
@@ -94,7 +95,7 @@ if ($btn) {
                 if (vacio([$nombre, $descripcion, $foto_ruta])) {
                     $errors[] = "Campos incompletos";
                 } else {
-                    if (registrar([$nombre, $descripcion, $foto_ruta], "productos", ["Nombre", "Descripcion", "IMG"], $pdo)) {
+                    if (registrar([$nombre, $descripcion, $foto_ruta], "categoria", ["Nombre", "Descripcion", "IMG"], $pdo)) {
                         if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
                             $errors[] = "Error al mover la imagen subida.";
                         }
@@ -104,7 +105,7 @@ if ($btn) {
                         header("Location: Empleado_tux.php");
                         exit();
                     } else {
-                        $errors[] = "Error al registrar el producto en la base de datos.";
+                        $errors[] = "Error al registrar la categoría en la base de datos.";
                     }
                 }
             } else {
@@ -112,19 +113,39 @@ if ($btn) {
             }
             break;
         case 'Buscar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si"
-            echo "Has Buscado el producto.";
+            if ($Acciones == "Producto") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
+                echo "Has buscado el producto.";
+            } elseif ($Acciones == "Categoria") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
+                echo "Has buscado la categoría.";
+            } else {
+                echo "Acción no reconocida para Buscar.";
+            }
             break;
 
         case 'Eliminar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si"
-            echo "Has Eliminado el producto.";
+            if ($Acciones == "Producto") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
+                echo "Has Eliminado el producto.";
+            } elseif ($Acciones == "Categoria") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
+                echo "Has Eliminado la categoría.";
+            } else {
+                echo "Acción no reconocida para Eliminar.";
+            }
             break;
         case 'Actualizar':
-            // Aquí puedes agregar la lógica para manejar la acción de "Si" 
-            echo "Has Actualizado el producto.";
+            if ($Acciones == "Producto") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
+                echo "Has Actualizado el producto.";
+            } elseif ($Acciones == "Categoria") {
+                // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
+                echo "Has Actualizado la categoría.";
+            } else {
+                echo "Acción no reconocida para Actualizar.";
+            }
             break;
-        // Puedes agregar más casos para otras acciones si es necesario
         default:
             echo "Acción no reconocida.";
     }
@@ -228,10 +249,11 @@ if (!$Session_estado) {
                     </select>
                     <?php else: ?>
                     <select name="categoria"
-                        class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select" disabled>
+                        class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select"
+                        disabled>
                         <option value="">No hay categorias disponibles</option>
                     </select>
-                    <?php endif;?>
+                    <?php endif; ?>
                 </div>
                 <div class="flex flex-row items-center gap-4">
                     <input type="text" placeholder="Marca" name="Marca"
@@ -245,36 +267,44 @@ if (!$Session_estado) {
             <!-- Categoria -->
             <div id="Categoria" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <textarea placeholder="Descripcion"
+                    <textarea placeholder="Descripcion" name="Descripcion"
                         class="p-2 w-100 border-black border-2 rounded-lg resize-none Categoria"></textarea>
                 </div>
             </div>
 
 
             <!-- Agregar imagen-->
-            <div id="Imagen" class="flex flex-row p-2 items-center gap-4 hidden">
+            <div id="Imagen" class="flex flex-row flex-wrap p-2 h-64 items-center gap-4 hidden">
                 <input type="file" accept="image/*" name="img" id="fileInput" class="hidden Producto Categoria">
                 <input type="text" value="" class="hidden">
                 <button onclick="document.getElementById('fileInput').click()" type="button"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
                     Imagen</button>
-                <div id="preview" class="w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
-                    <span class="cursor-default text-gray-500">Vista previa de la imagen</span>
+                <div id="preview" onclick="document.getElementById('fileInput').click()"  class="cursor-pointer w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
+                    <span class="cursor-pointer text-gray-500">Subir imagen</span>
                 </div>
                 <!-- Botones-->
-                <div class="flex flex-col items-center gap-4">
+                <div class="flex flex-col flex-wrap h-64 justify-center  gap-4">
+                    <?php if (!$buscar): ?>
                     <input id="Guardar"
                         class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
                         type="button" value="Guardar">
                     <input id="Buscar"
                         class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
                         type="button" value="Buscar">
-                    <input
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
-                        type="button" value="Eliminar">
+                    <?php else: ?>
                     <input
                         class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
                         type="button" value="Actualizar">
+
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
+                        type="button" value="Eliminar">
+                    <?php endif; ?>
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-orange-500 text-white rounded-lg Action-B"
+                        type="button" value="Limpiar">
+
                 </div>
             </div>
 
@@ -329,7 +359,7 @@ var ImagenDiv = document.getElementById('Imagen');
 var productosDiv = document.getElementById('productos');
 var categoriaDiv = document.getElementById('Categoria');
 var Editar_crearSelect = document.getElementById('Editar_crear');
-var ResetElementos = document.querySelectorAll('.Productos, .Categoria');
+var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
 
 if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
     accionesSelect.addEventListener('change',
@@ -356,12 +386,12 @@ if (accionesSelect) { // Verifica si el elemento existe antes de agregar el even
                     console.log('Opción no válida');
             }
 
-            ResetElementos.forEach(function(element) {
+            ResetElementos.forEach(element => {
                 if (!element.classList.contains('select')) {
                     element.value = ''; // Limpia el valor de cada campo de entrada
+                    preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
                 }
             });
-
         });
 }
 
@@ -379,7 +409,7 @@ if (fileInput) {
             }
             reader.readAsDataURL(file);
         } else {
-            preview.innerHTML = '<span class="text-gray-500">Vista previa de la imagen</span>';
+            preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
         }
     });
 }

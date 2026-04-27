@@ -13,32 +13,41 @@ var AceptModalButton = document.getElementById("AceptModal");
 
 ActionButtons.forEach(function (button) {
   button.addEventListener("click", function () {
-    // Validar campos vacíos
-    var ElementosSeccion = document.querySelectorAll(
-      "." + accionesSelect.value,
-    );
+    if (button.value != "Buscar" && button.value != "Limpiar") {
+      // Validar campos vacíos
+      var ElementosSeccion = document.querySelectorAll(
+        "." + accionesSelect.value,
+      );
 
-    var vacio = false;
+      var vacio = false;
 
-    for (const elemento of ElementosSeccion) {
-      if (elemento.name === "Nombre") {
-        //encuentra el input con con el name nombre
-        var Nombre = elemento.value; //entonces obtenemos el texto del elemento
+      for (const elemento of ElementosSeccion) {
+        if (elemento.name === "Nombre") {
+          //encuentra el input con con el name nombre
+          var Nombre = elemento.value; //entonces obtenemos el texto del elemento
+        }
+
+        if (elemento.value.trim() === "") {
+          Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
+          vacio = true;
+          break;
+        }
       }
 
-      if (elemento.value.trim() === "") {
-        Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
-        vacio = true;
-        break;
+      if (!vacio) {
+        Modal.classList.remove("hidden"); // Muestra el modal de confirmación
+        M_Title.value = button.value + " " + Nombre; // Cambia el título del modal según el botón de acción presionado
+        M_Content.textContent =
+          "¿Esta seguro de " + button.value + " " + Nombre + " ?"; //Cambia el texto segun la seleccion
+        AceptModalButton.value = button.value; // Cambia el valor del botón de aceptar según el botón de acción presionado
       }
-    }
-
-    if (!vacio) {
-      Modal.classList.remove("hidden"); // Muestra el modal de confirmación
-      M_Title.value = button.value + " " + Nombre; // Cambia el título del modal según el botón de acción presionado
-      M_Content.textContent =
-        "¿Esta seguro de " + button.value + " " + Nombre + " ?"; //Cambia el texto segun la seleccion
-      AceptModalButton.value = button.value; // Cambia el valor del botón de aceptar según el botón de acción presionado
+    } else if (button.value == "Limpiar") {
+      ResetElementos.forEach((element) => {
+        if (!element.classList.contains("select")) {
+          element.value = ""; // Limpia el valor de cada campo de entrada
+          preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+        }
+      });
     }
   });
 });
