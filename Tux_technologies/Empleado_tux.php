@@ -15,6 +15,7 @@ $Acciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";
 $errors = [];
 $categoria = [];
 $buscar = false;
+$producto = [];
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
 
@@ -114,8 +115,27 @@ if ($btn) {
             break;
         case 'Buscar':
             if ($Acciones == "Producto") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
-                echo "Has buscado el producto.";
+                $nombre = trim($_POST["Nombre"]) ?? "";
+
+                if (vacio([$nombre])) {
+                    $errors[] = "Campos incompletos";
+                } else {
+                    //Inicio consulta
+                    $sql = $pdo->prepare('SELECT * FROM productos WHERE Nombre = :Nombre');
+                    $sql->bindParam(':Nombre', $nombre);
+                    if ($sql->execute()) {
+                        $producto = $sql->fetch(PDO::FETCH_ASSOC);
+                        if ($producto != null) {
+                            $buscar = true;
+                            $_SESSION["Acciones"] = $Acciones;
+                             echo "$Acciones";
+                        } else {
+                            $errors[] = "  no encontrado";
+                        }
+                    } else {
+                        $errors[] = "Producto no encontrado";
+                    }
+                }
             } elseif ($Acciones == "Categoria") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
                 echo "Has buscado la categoría.";
@@ -220,12 +240,12 @@ if (!$Session_estado) {
     <div class="h-16"></div>
 
 
-    <!-- Menu del Empleado -->
+    <!-- Menu del Empleado -->  
     <form action="Empleado_tux.php" method="post" class="flex flex-col items-center mt-8" enctype="multipart/form-data">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Empleado</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
-                <input type="text" placeholder="Nombre" name="Nombre"
+                <input type="text" placeholder="Nombre" name="Nombre" <?php echo $buscar ? 'value="' . $producto["Nombre"] . '"' : ""; ?>
                     class="p-2 border-black border-2 rounded-lg Producto Categoria">
                 <select id="acciones" name="acciones" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg"
                     required>
@@ -236,23 +256,24 @@ if (!$Session_estado) {
             </div>
             <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Precio" name="Precio"
+                    <input type="text" placeholder="Precio" name="Precio" <?php echo $buscar ? 'value="' . $producto["Precio"] . '"' : ""; ?>
                         oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
                     <?php if (count($categoria) > 0): ?>
-                    <select name="Categoria"
-                        class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
-                        <?php foreach ($categoria as $cat): ?>
-                        <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <select name="Categoria"
+                            class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
+                            <?php echo $buscar ? '<option value="' . $producto["Categoria"] . '">' . $producto["Categoria"] . '</option>': ""; ?>
+                            <?php foreach ($categoria as $cat): ?>
+                                <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
+                                </option>
+                            <?php endforeach; ?>    
+                        </select>
                     <?php else: ?>
-                    <select name="categoria"
-                        class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select"
-                        disabled>
-                        <option value="">No hay categorias disponibles</option>
-                    </select>
+                        <select name="categoria"
+                            class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select"
+                            disabled>
+                            <option value="">No hay categorias disponibles</option>
+                        </select>
                     <?php endif; ?>
                 </div>
                 <div class="flex flex-row items-center gap-4">
@@ -276,30 +297,30 @@ if (!$Session_estado) {
             <!-- Agregar imagen-->
             <div id="Imagen" class="flex flex-row flex-wrap p-2 h-64 items-center gap-4 hidden">
                 <input type="file" accept="image/*" name="img" id="fileInput" class="hidden Producto Categoria">
-                <input type="text" value="" class="hidden">
+
                 <button onclick="document.getElementById('fileInput').click()" type="button"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
                     Imagen</button>
-                <div id="preview" onclick="document.getElementById('fileInput').click()"  class="cursor-pointer w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
+                <div id="preview" onclick="document.getElementById('fileInput').click()" class="cursor-pointer w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
                     <span class="cursor-pointer text-gray-500">Subir imagen</span>
                 </div>
                 <!-- Botones-->
                 <div class="flex flex-col flex-wrap h-64 justify-center  gap-4">
                     <?php if (!$buscar): ?>
-                    <input id="Guardar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
-                        type="button" value="Guardar">
-                    <input id="Buscar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
-                        type="button" value="Buscar">
+                        <input id="Guardar"
+                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
+                            type="button" value="Guardar">
+                        <input id="Buscar"
+                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
+                            type="button" value="Buscar">
                     <?php else: ?>
-                    <input
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
-                        type="button" value="Actualizar">
+                        <input
+                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                            type="button" value="Actualizar">
 
-                    <input
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
-                        type="button" value="Eliminar">
+                        <input
+                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
+                            type="button" value="Eliminar">
                     <?php endif; ?>
                     <input
                         class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-orange-500 text-white rounded-lg Action-B"
@@ -354,78 +375,85 @@ if (!$Session_estado) {
     </form>
 </body>
 <script>
-var accionesSelect = document.getElementById('acciones');
-var ImagenDiv = document.getElementById('Imagen');
-var productosDiv = document.getElementById('productos');
-var categoriaDiv = document.getElementById('Categoria');
-var Editar_crearSelect = document.getElementById('Editar_crear');
-var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
+    var accionesSelect = document.getElementById('acciones');
+    var ImagenDiv = document.getElementById('Imagen');
+    var productosDiv = document.getElementById('productos');
+    var categoriaDiv = document.getElementById('Categoria');
+    var Editar_crearSelect = document.getElementById('Editar_crear');
+    var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
 
-if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-    accionesSelect.addEventListener('change',
-        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-            // Reinicia los campos de entrada cada vez que se cambia la selección
-            var selectedValue = this.value;
-            switch (selectedValue) {
-                case 'Crear':
-                    ImagenDiv.classList.add('hidden');
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Producto':
-                    ImagenDiv.classList.remove('hidden');
-                    productosDiv.classList.remove('hidden');
-                    categoriaDiv.classList.add('hidden');
-                    break;
-                case 'Categoria':
-                    productosDiv.classList.add('hidden');
-                    categoriaDiv.classList.remove('hidden');
-                    ImagenDiv.classList.remove('hidden');
-                    break;
-                default:
-                    console.log('Opción no válida');
-            }
 
-            ResetElementos.forEach(element => {
-                if (!element.classList.contains('select')) {
-                    element.value = ''; // Limpia el valor de cada campo de entrada
-                    preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+    if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
+        accionesSelect.addEventListener('change',
+            function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+                // Reinicia los campos de entrada cada vez que se cambia la selección
+                var selectedValue = this.value;
+                switch (selectedValue) {
+                    case 'Crear':
+                        ImagenDiv.classList.add('hidden');
+                        productosDiv.classList.add('hidden');
+                        categoriaDiv.classList.add('hidden');
+                        break;
+                    case 'Producto':
+                        ImagenDiv.classList.remove('hidden');
+                        productosDiv.classList.remove('hidden');
+                        categoriaDiv.classList.add('hidden');
+                        break;
+                    case 'Categoria':
+                        productosDiv.classList.add('hidden');
+                        categoriaDiv.classList.remove('hidden');
+                        ImagenDiv.classList.remove('hidden');
+                        break;
+                    default:
+                        console.log('Opción no válida');
                 }
+                <?php if (!$buscar): ?>
+                    ResetElementos.forEach(element => {
+                        if (!element.classList.contains('select')) {
+                            element.value = ''; // Limpia el valor de cada campo de entrada
+                            preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+                        }
+                    });
+                <?php endif; ?>
             });
-        });
-}
+    }
 
-var fileInput = document.getElementById('fileInput');
-var preview = document.getElementById('preview');
+    <?php if ($buscar): ?>
+        accionesSelect.value = "<?php echo $Acciones; ?>";
+        accionesSelect.dispatchEvent(new Event('change'));
+    <?php endif; ?>
 
-if (fileInput) {
-    fileInput.addEventListener('change', function() {
-        var file = this.files[0]; //Obtiene la primera imagen seleccionada  
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                preview.innerHTML = '<img src="' + e.target.result +
-                    '" class="w-full h-full object-cover rounded-lg">';
+    var fileInput = document.getElementById('fileInput');
+    var preview = document.getElementById('preview');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            var file = this.files[0]; //Obtiene la primera imagen seleccionada  
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result +
+                        '" class="w-full h-full object-cover rounded-lg">';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
             }
-            reader.readAsDataURL(file);
-        } else {
-            preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
-        }
-    });
-}
+        });
+    }
 
-//Si recarga pagina reiniciar select 
-window.onbeforeunload = function(e) {
-    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-};
+    //Si recarga pagina reiniciar select 
+    window.onbeforeunload = function(e) {
+        accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+    };
 
-var AceptModalButton = document.getElementById("AceptModal");
-
-function AceptModalButtonSubmit() {
     var AceptModalButton = document.getElementById("AceptModal");
-    AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
-    AceptModalButton.click();
-}
+
+    function AceptModalButtonSubmit() {
+        var AceptModalButton = document.getElementById("AceptModal");
+        AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
+        AceptModalButton.click();
+    }
 </script>
 <script src="js/General.js"></script>
 
