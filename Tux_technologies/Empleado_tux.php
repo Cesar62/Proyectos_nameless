@@ -11,11 +11,13 @@ $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del
 $modal = $_SESSION["modal"] ?? false;
 $accion = $_SESSION["Accion"] ?? "";
 $btn = $_POST['Accion'] ?? null;
-$Acciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";
-$errors = [];
-$categoria = [];
-$buscar = false;
-$producto = [];
+$secciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";  //Guarda la zona en la que se esta productos, buscar y asi
+$errors = [];  //Guarda los errores que puedan suceder
+$categoria = []; //Carga las categorias de la base de datos
+$exito = $_SESSION["exito"] ?? false; //lo uso para moverse de sesion si funciona alguna consulta 
+$busquedaArray = []; //Array que carga los datos
+$editar = false; //variable cuando se quieran editar documentos
+$porPagina = 5; //Esto guarda cuantos elementos se ven al consultar
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
 
@@ -28,7 +30,7 @@ if ($sql->execute()) {
 if ($btn) {
     switch ($btn) {
         case 'Guardar': //Guardar en la bd
-            if ($Acciones == "Producto") {
+            if ($secciones == "Producto") {
                 $nombre = trim($_POST["Nombre"]) ?? "";
                 $precio = trim($_POST["Precio"]) ?? "";
                 $categoria = trim($_POST["Categoria"]) ?? "";
@@ -57,20 +59,21 @@ if ($btn) {
                 if (vacio([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta])) {
                     $errors[] = "Campos incompletos";
                 } else {
-                    if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "productos", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
+                    if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "producto", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
                         if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
                             $errors[] = "Error al mover la imagen subida.";
                         }
                         $_SESSION["modal"] = true;
+                        $_SESSION["exito"] = true;
                         $_SESSION["Accion"] = $btn;
-                        $_SESSION["Acciones"] = $Acciones;
+                        $_SESSION["Acciones"] = $secciones;
                         header("Location: Empleado_tux.php");
                         exit();
                     } else {
                         $errors[] = "Error al registrar el producto en la base de datos.";
                     }
                 }
-            } elseif ($Acciones == "Categoria") {
+            } elseif ($secciones == "Categoria") {
                 $nombre = trim($_POST["Nombre"]) ?? "";
                 $descripcion = trim($_POST["Descripcion"]) ?? "";
                 $foto_ruta = "";
@@ -101,8 +104,9 @@ if ($btn) {
                             $errors[] = "Error al mover la imagen subida.";
                         }
                         $_SESSION["modal"] = true;
+                        $_SESSION["exito"] = true;
                         $_SESSION["Accion"] = $btn;
-                        $_SESSION["Acciones"] = $Acciones;
+                        $_SESSION["Acciones"] = $secciones;
                         header("Location: Empleado_tux.php");
                         exit();
                     } else {
@@ -114,41 +118,22 @@ if ($btn) {
             }
             break;
         case 'Buscar':
-            if ($Acciones == "Producto") {
-                $nombre = trim($_POST["Nombre"]) ?? "";
+            $nombre = trim($_POST["Nombre"]) ?? "";
+            $buscar = trim($_POST["Buscar"]) ?? "";
 
-                if (vacio([$nombre])) {
-                    $errors[] = "Campos incompletos";
-                } else {
-                    //Inicio consulta
-                    $sql = $pdo->prepare('SELECT * FROM productos WHERE Nombre = :Nombre');
-                    $sql->bindParam(':Nombre', $nombre);
-                    if ($sql->execute()) {
-                        $producto = $sql->fetch(PDO::FETCH_ASSOC);
-                        if ($producto != null) {
-                            $buscar = true;
-                            $_SESSION["Acciones"] = $Acciones;
-                             echo "$Acciones";
-                        } else {
-                            $errors[] = "  no encontrado";
-                        }
-                    } else {
-                        $errors[] = "Producto no encontrado";
-                    }
-                }
-            } elseif ($Acciones == "Categoria") {
-                // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
-                echo "Has buscado la categoría.";
+            if (vacio([$nombre, $buscar])) {
+                $errors[] = "Campos incompletos";
             } else {
-                echo "Acción no reconocida para Buscar.";
+                echo "No esta vacio";
             }
+
             break;
 
         case 'Eliminar':
-            if ($Acciones == "Producto") {
+            if ($secciones == "Producto") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
                 echo "Has Eliminado el producto.";
-            } elseif ($Acciones == "Categoria") {
+            } elseif ($secciones == "Categoria") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
                 echo "Has Eliminado la categoría.";
             } else {
@@ -156,10 +141,10 @@ if ($btn) {
             }
             break;
         case 'Actualizar':
-            if ($Acciones == "Producto") {
+            if ($secciones == "Producto") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para productos
                 echo "Has Actualizado el producto.";
-            } elseif ($Acciones == "Categoria") {
+            } elseif ($secciones == "Categoria") {
                 // Aquí puedes agregar la lógica para manejar la acción de "Si" para categorías
                 echo "Has Actualizado la categoría.";
             } else {
@@ -176,7 +161,7 @@ if ($modal) {
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
                 <div class='bg-white p-6 rounded-lg'>
                     <h2 class='text-2xl font-bold mb-4'>Resultado de la acción</h2>
-                    <p class='mb-4'>$accion $Acciones con exito</p>
+                    <p class='mb-4'>$accion $secciones con exito</p>
                     <button class='cursor-pointer hover:scale-105 px-4 py-2 bg-red-500 text-white rounded-lg CloseModal'>Cerrar</button>
                 </div>
             </div>
@@ -240,33 +225,35 @@ if (!$Session_estado) {
     <div class="h-16"></div>
 
 
-    <!-- Menu del Empleado -->  
+    <!-- Menu del Empleado -->
     <form action="Empleado_tux.php" method="post" class="flex flex-col items-center mt-8" enctype="multipart/form-data">
         <div class="flex flex-col w-[75%] items-center p-8 border-black border-2 rounded-lg bg-gray-300">
             <h1 class="text-4xl font-bold">Panel de Empleado</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
-                <input type="text" placeholder="Nombre" name="Nombre" <?php echo $buscar ? 'value="' . $producto["Nombre"] . '"' : ""; ?>
-                    class="p-2 border-black border-2 rounded-lg Producto Categoria">
+                <input type="text" placeholder="Nombre" name="Nombre"
+
+                    class="p-2 border-black border-2 rounded-lg Producto Categoria Buscar">
                 <select id="acciones" name="acciones" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg"
                     required>
                     <option value="" disabled selected>Que Desea Crear</option>
                     <option value="Producto">Producto</option>
                     <option value="Categoria">Categoria</option>
+                    <option value="Buscar">Buscar</option>
                 </select>
             </div>
             <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <input type="text" placeholder="Precio" name="Precio" <?php echo $buscar ? 'value="' . $producto["Precio"] . '"' : ""; ?>
+                    <input type="text" placeholder="Precio" name="Precio"
+
                         oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
                     <?php if (count($categoria) > 0): ?>
                         <select name="Categoria"
                             class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
-                            <?php echo $buscar ? '<option value="' . $producto["Categoria"] . '">' . $producto["Categoria"] . '</option>': ""; ?>
                             <?php foreach ($categoria as $cat): ?>
                                 <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
                                 </option>
-                            <?php endforeach; ?>    
+                            <?php endforeach; ?>
                         </select>
                     <?php else: ?>
                         <select name="categoria"
@@ -301,18 +288,16 @@ if (!$Session_estado) {
                 <button onclick="document.getElementById('fileInput').click()" type="button"
                     class="cursor-pointer hover:scale-105 px-4 py-2 bg-blue-500 text-white rounded-lg">Subir
                     Imagen</button>
-                <div id="preview" onclick="document.getElementById('fileInput').click()" class="cursor-pointer w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
+                <div id="preview" onclick="document.getElementById('fileInput').click()"
+                    class="cursor-pointer w-64 h-64 border-2 border-black rounded-lg flex items-center justify-center ">
                     <span class="cursor-pointer text-gray-500">Subir imagen</span>
                 </div>
                 <!-- Botones-->
                 <div class="flex flex-col flex-wrap h-64 justify-center  gap-4">
-                    <?php if (!$buscar): ?>
+                    <?php if (!$editar): ?>
                         <input id="Guardar"
                             class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
                             type="button" value="Guardar">
-                        <input id="Buscar"
-                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-yellow-500 text-white rounded-lg Action-B"
-                            type="button" value="Buscar">
                     <?php else: ?>
                         <input
                             class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
@@ -328,7 +313,19 @@ if (!$Session_estado) {
 
                 </div>
             </div>
-
+            <!--Buscar-->
+            <div id="Buscar" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
+                <div class="flex flex-row items-center gap-4">
+                    <label class="text-black text-lg">Buscar por</label>
+                    <select name="Buscar" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg">
+                        <option value="Producto">Producto</option>
+                        <option value="Categoria">Categoria</option>
+                    </select>
+                    <input id="btnBuscar"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                        type="button" value="Buscar">
+                </div>
+            </div>
         </div>
 
         <!-- Modal-->
@@ -379,6 +376,7 @@ if (!$Session_estado) {
     var ImagenDiv = document.getElementById('Imagen');
     var productosDiv = document.getElementById('productos');
     var categoriaDiv = document.getElementById('Categoria');
+    var buscarDiv = document.getElementById('Buscar');
     var Editar_crearSelect = document.getElementById('Editar_crear');
     var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
 
@@ -393,21 +391,30 @@ if (!$Session_estado) {
                         ImagenDiv.classList.add('hidden');
                         productosDiv.classList.add('hidden');
                         categoriaDiv.classList.add('hidden');
+                        buscarDiv.classList.add('hidden');
                         break;
                     case 'Producto':
                         ImagenDiv.classList.remove('hidden');
                         productosDiv.classList.remove('hidden');
                         categoriaDiv.classList.add('hidden');
+                        buscarDiv.classList.add('hidden');
                         break;
                     case 'Categoria':
                         productosDiv.classList.add('hidden');
                         categoriaDiv.classList.remove('hidden');
                         ImagenDiv.classList.remove('hidden');
+                        buscarDiv.classList.add('hidden');
+                        break;
+                    case 'Buscar':
+                        ImagenDiv.classList.add('hidden');
+                        productosDiv.classList.add('hidden');
+                        categoriaDiv.classList.add('hidden');
+                        buscarDiv.classList.remove('hidden');
                         break;
                     default:
                         console.log('Opción no válida');
                 }
-                <?php if (!$buscar): ?>
+                <?php if (!$exito): ?>
                     ResetElementos.forEach(element => {
                         if (!element.classList.contains('select')) {
                             element.value = ''; // Limpia el valor de cada campo de entrada
@@ -418,8 +425,8 @@ if (!$Session_estado) {
             });
     }
 
-    <?php if ($buscar): ?>
-        accionesSelect.value = "<?php echo $Acciones; ?>";
+    <?php if ($exito): ?>
+        accionesSelect.value = "<?php echo $secciones; ?>";
         accionesSelect.dispatchEvent(new Event('change'));
     <?php endif; ?>
 
