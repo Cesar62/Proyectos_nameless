@@ -8,7 +8,7 @@ session_start();
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
-$modal = $_SESSION["modal"] ?? false;
+$modal = $_SESSION["modal"] ?? false; // Es el modal que se va a mostrar cuando se requiera
 $accion = $_SESSION["Accion"] ?? "";
 $btn = $_POST['Accion'] ?? null;
 $secciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";  //Guarda la zona en la que se esta productos, buscar y asi
@@ -18,6 +18,8 @@ $exito = $_SESSION["exito"] ?? false; //lo uso para moverse de sesion si funcion
 $busquedaArray = []; //Array que carga los datos
 $editar = false; //variable cuando se quieran editar documentos
 $porPagina = 5; //Esto guarda cuantos elementos se ven al consultar
+$totalPaginas = 0;
+$busqueda = false; // Si es true mostrara los resultados de la busqueda
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
 
@@ -118,13 +120,41 @@ if ($btn) {
             }
             break;
         case 'Buscar':
-            $nombre = trim($_POST["Nombre"]) ?? "";
-            $buscar = trim($_POST["Buscar"]) ?? "";
+            $nombre = trim($_POST["Nombre"] ?? "");
+            $tabla = strtolower(trim($_POST["buscar"] ?? ""));
+            $campo = strtolower(trim($_POST["buscarPor"] ?? ""));
+            $paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
-            if (vacio([$nombre, $buscar])) {
+            if ($paginaActual < 1) $paginaActual = 1; //para que no escriban paginas negativas 
+            $incioConsulta = ($paginaActual - 1) * $porPagina; //Desde donde se van a empezar a buscar los registros
+
+            if (vacio([$nombre, $tabla])) {
                 $errors[] = "Campos incompletos";
             } else {
-                echo "No esta vacio";
+                $totalRegistros = $pdo->prepare("SELECT COUNT(*) FROM $tabla WHERE $campo = :campo");  //Toda esta consulta solo es para contar cuantos coinciden con lo que se busca
+                $totalRegistros->bindParam(":campo", $nombre, PDO::PARAM_STR);
+                $ok = $totalRegistros->execute();
+
+                if ($ok) {
+                    $conteo = $totalRegistros->fetchColumn();
+
+                    if ($conteo > 0) { // Si funciona empesaria ya la consulta que va a mostrar resultados
+                        echo $conteo;
+                        $BusquedaSql = $pdo->prepare("SELECT * FROM $tabla WHERE $campo = :campo LIMIT $incioConsulta, $porPagina"); //consulta con limit
+                        $BusquedaSql->bindParam(":campo", $nombre, PDO::PARAM_STR);
+                        $ok = $BusquedaSql->execute();
+                        $busquedaArray = $BusquedaSql->fetchAll(PDO::FETCH_ASSOC);
+                        $busqueda = true;
+
+                        $_SESSION["exito"] = true;
+                        $_SESSION["Accion"] = $btn;
+                        $_SESSION["Acciones"] = $secciones;
+                    } else {
+                        $errors[] = "No encontró resultados";
+                    }
+                } else {
+                    $errors[] = "error en consulta sql";
+                }
             }
 
             break;
@@ -156,6 +186,8 @@ if ($btn) {
     }
 }
 
+
+
 if ($modal) {
     echo "
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
@@ -166,9 +198,9 @@ if ($modal) {
                 </div>
             </div>
         ";
-    $_SESSION["modal"] = false;
+    $_SESSION["modal"] = false; //Para que no se vea el modal al recargar
 } else if (count($errors) > 0) {
-    $errorMessages = implode("<br>", $errors);
+    $errorMessages = implode("<br>", $errors); //implode agrega algo antes de cada index del array
     echo "
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
                 <div class='bg-white p-6 rounded-lg'>
@@ -178,6 +210,7 @@ if ($modal) {
                 </div>
             </div>
         ";
+    $errors = []; //Limpio la variable supongo
 }
 
 if (!$Session_estado) {
@@ -231,7 +264,6 @@ if (!$Session_estado) {
             <h1 class="text-4xl font-bold">Panel de Empleado</h1>
             <div class="flex flex-row items-center p-4 justify-center gap-4 ">
                 <input type="text" placeholder="Nombre" name="Nombre"
-
                     class="p-2 border-black border-2 rounded-lg Producto Categoria Buscar">
                 <select id="acciones" name="acciones" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg"
                     required>
@@ -244,23 +276,22 @@ if (!$Session_estado) {
             <div id="productos" class="flex flex-col items-center justify-center gap-4 hidden">
                 <div class="flex flex-row items-center gap-4">
                     <input type="text" placeholder="Precio" name="Precio"
-
                         oninput="this.value = this.value.replace(/[a-zA-Z]/g, '')"
                         class="p-2 border-black border-2 rounded-lg appearance-none Producto">
                     <?php if (count($categoria) > 0): ?>
-                        <select name="Categoria"
-                            class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
-                            <?php foreach ($categoria as $cat): ?>
-                                <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <select name="Categoria"
+                        class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg Producto select">
+                        <?php foreach ($categoria as $cat): ?>
+                        <option value="<?php echo htmlspecialchars($cat); ?>"><?php echo htmlspecialchars($cat); ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
                     <?php else: ?>
-                        <select name="categoria"
-                            class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select"
-                            disabled>
-                            <option value="">No hay categorias disponibles</option>
-                        </select>
+                    <select name="categoria"
+                        class="p-1 w-60 cursor-pointer border-black/50 text-gray-500 border-2 rounded-lg Producto select"
+                        disabled>
+                        <option value="">No hay categorias disponibles</option>
+                    </select>
                     <?php endif; ?>
                 </div>
                 <div class="flex flex-row items-center gap-4">
@@ -295,17 +326,17 @@ if (!$Session_estado) {
                 <!-- Botones-->
                 <div class="flex flex-col flex-wrap h-64 justify-center  gap-4">
                     <?php if (!$editar): ?>
-                        <input id="Guardar"
-                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
-                            type="button" value="Guardar">
+                    <input id="Guardar"
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-green-500 text-white rounded-lg Action-B"
+                        type="button" value="Guardar">
                     <?php else: ?>
-                        <input
-                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
-                            type="button" value="Actualizar">
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                        type="button" value="Actualizar">
 
-                        <input
-                            class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
-                            type="button" value="Eliminar">
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
+                        type="button" value="Eliminar">
                     <?php endif; ?>
                     <input
                         class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-orange-500 text-white rounded-lg Action-B"
@@ -316,15 +347,43 @@ if (!$Session_estado) {
             <!--Buscar-->
             <div id="Buscar" class="flex flex-col items-center p-4 justify-center gap-5 hidden">
                 <div class="flex flex-row items-center gap-4">
-                    <label class="text-black text-lg">Buscar por</label>
-                    <select name="Buscar" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg">
+                    <label class="text-black text-lg">Que desea Buscar</label>
+                    <select id="quebusca" name="buscar"
+                        class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg">
                         <option value="Producto">Producto</option>
                         <option value="Categoria">Categoria</option>
                     </select>
-                    <input id="btnBuscar"
-                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
-                        type="button" value="Buscar">
                 </div>
+                <div id="buscarpor" class="flex flex-row items-center gap-4">
+                    <label class="text-black text-lg">Buscar por</label>
+                    <select name="buscarPor" class="p-1 w-60 cursor-pointer border-black border-2 rounded-lg">
+                        <option value="Nombre">Nombre</option>
+                        <option value="Categoria">Categoria</option>
+                    </select>
+                </div>
+                <input id="btnBuscar"
+                    class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                    type="button" value="Buscar">
+                <?php if($busqueda):?>
+                <div class="grid grid-cols-4 gap-2 place-items-center text-lg w-full">
+                    <p>ID</p>
+                    <p>Nombre</p>
+                </div>
+                <?php foreach($busquedaArray as $resultadoBusqueda):?>
+                <div class="grid grid-cols-4 p-2 gap-2 place-items-center w-full border-t-2 border-black">
+                    <p><?php echo $resultadoBusqueda["ID"];?></p>
+                    <p><?php echo $resultadoBusqueda["Nombre"];?></p>
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
+                        type="button" value="Editar">
+
+                    <input
+                        class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-red-500 text-white rounded-lg Action-B"
+                        type="button" value="Eliminar">
+
+                </div>
+                <?php endforeach;?>
+                <?php endif;?>
             </div>
         </div>
 
@@ -372,95 +431,106 @@ if (!$Session_estado) {
     </form>
 </body>
 <script>
-    var accionesSelect = document.getElementById('acciones');
-    var ImagenDiv = document.getElementById('Imagen');
-    var productosDiv = document.getElementById('productos');
-    var categoriaDiv = document.getElementById('Categoria');
-    var buscarDiv = document.getElementById('Buscar');
-    var Editar_crearSelect = document.getElementById('Editar_crear');
-    var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
+var accionesSelect = document.getElementById('acciones');
+var ImagenDiv = document.getElementById('Imagen');
+var productosDiv = document.getElementById('productos');
+var categoriaDiv = document.getElementById('Categoria');
+var buscarDiv = document.getElementById('Buscar');
+var Editar_crearSelect = document.getElementById('Editar_crear');
+var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
 
 
-    if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
-        accionesSelect.addEventListener('change',
-            function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
-                // Reinicia los campos de entrada cada vez que se cambia la selección
-                var selectedValue = this.value;
-                switch (selectedValue) {
-                    case 'Crear':
-                        ImagenDiv.classList.add('hidden');
-                        productosDiv.classList.add('hidden');
-                        categoriaDiv.classList.add('hidden');
-                        buscarDiv.classList.add('hidden');
-                        break;
-                    case 'Producto':
-                        ImagenDiv.classList.remove('hidden');
-                        productosDiv.classList.remove('hidden');
-                        categoriaDiv.classList.add('hidden');
-                        buscarDiv.classList.add('hidden');
-                        break;
-                    case 'Categoria':
-                        productosDiv.classList.add('hidden');
-                        categoriaDiv.classList.remove('hidden');
-                        ImagenDiv.classList.remove('hidden');
-                        buscarDiv.classList.add('hidden');
-                        break;
-                    case 'Buscar':
-                        ImagenDiv.classList.add('hidden');
-                        productosDiv.classList.add('hidden');
-                        categoriaDiv.classList.add('hidden');
-                        buscarDiv.classList.remove('hidden');
-                        break;
-                    default:
-                        console.log('Opción no válida');
-                }
-                <?php if (!$exito): ?>
-                    ResetElementos.forEach(element => {
-                        if (!element.classList.contains('select')) {
-                            element.value = ''; // Limpia el valor de cada campo de entrada
-                            preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
-                        }
-                    });
-                <?php endif; ?>
-            });
-    }
-
-    <?php if ($exito): ?>
-        accionesSelect.value = "<?php echo $secciones; ?>";
-        accionesSelect.dispatchEvent(new Event('change'));
-    <?php endif; ?>
-
-    var fileInput = document.getElementById('fileInput');
-    var preview = document.getElementById('preview');
-
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            var file = this.files[0]; //Obtiene la primera imagen seleccionada  
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result +
-                        '" class="w-full h-full object-cover rounded-lg">';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
+    accionesSelect.addEventListener('change',
+        function() { //El addEventListener se encarga de detectar el cambio en el select y ejecutar la función cada vez que se selecciona una opción diferente
+            // Reinicia los campos de entrada cada vez que se cambia la selección
+            var selectedValue = this.value;
+            switch (selectedValue) {
+                case 'Crear':
+                    ImagenDiv.classList.add('hidden');
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    buscarDiv.classList.add('hidden');
+                    break;
+                case 'Producto':
+                    ImagenDiv.classList.remove('hidden');
+                    productosDiv.classList.remove('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    buscarDiv.classList.add('hidden');
+                    break;
+                case 'Categoria':
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.remove('hidden');
+                    ImagenDiv.classList.remove('hidden');
+                    buscarDiv.classList.add('hidden');
+                    break;
+                case 'Buscar':
+                    ImagenDiv.classList.add('hidden');
+                    productosDiv.classList.add('hidden');
+                    categoriaDiv.classList.add('hidden');
+                    buscarDiv.classList.remove('hidden');
+                    break;
+                default:
+                    console.log('Opción no válida');
             }
+            <?php if (!$exito): ?>
+            ResetElementos.forEach(element => {
+                if (!element.classList.contains('select')) {
+                    element.value = ''; // Limpia el valor de cada campo de entrada
+                    preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+                }
+            });
+            <?php endif; ?>
         });
-    }
+}
 
-    //Si recarga pagina reiniciar select 
-    window.onbeforeunload = function(e) {
-        accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
-    };
+<?php if ($exito): ?>
+accionesSelect.value = "<?php echo $secciones; ?>";
+accionesSelect.dispatchEvent(new Event('change'));
+<?php endif; ?>
 
+var fileInput = document.getElementById('fileInput');
+var preview = document.getElementById('preview');
+
+if (fileInput) {
+    fileInput.addEventListener('change', function() {
+        var file = this.files[0]; //Obtiene la primera imagen seleccionada  
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = '<img src="' + e.target.result +
+                    '" class="w-full h-full object-cover rounded-lg">';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>';
+        }
+    });
+}
+
+//Si recarga pagina reiniciar select 
+window.onbeforeunload = function(e) {
+    accionesSelect.selectedIndex = 0; // Reinicia el select al valor predeterminado
+};
+
+var AceptModalButton = document.getElementById("AceptModal");
+
+function AceptModalButtonSubmit() {
     var AceptModalButton = document.getElementById("AceptModal");
+    AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
+    AceptModalButton.click();
+}
 
-    function AceptModalButtonSubmit() {
-        var AceptModalButton = document.getElementById("AceptModal");
-        AceptModalButton.type = "submit"; // Cambia el tipo del botón a submit para enviar el formulario
-        AceptModalButton.click();
+const quebusca = document.getElementById("quebusca");
+const buscarpor = document.getElementById("buscarpor");
+quebusca.addEventListener('change', function() {
+    if (quebusca.value === "Producto") {
+        buscarpor.classList.remove("hidden");
+    } else {
+        buscarpor.classList.add("hidden");
+        buscarpor.value = "pruebita"
     }
+});
 </script>
 <script src="js/General.js"></script>
 

@@ -26,9 +26,8 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                     "Sesion" => true,
                     "Sesion_Info" => $login
                 ];
-
-                $Empleado_Info = $login; // actualizar información del empleado en esta carga
-                $Session_estado = true;
+                header("Location: Adm_M.php");
+                exit();
             } else {
                 $Login_Fallo = true;
                 $Mensaje = "Contraseña Incorrecta";
@@ -44,6 +43,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
             "Sesion" => false,
             "Sesion_Info" => []
         ];
+        $_SESSION = [];
         $Session_estado = false;
     }
 }
@@ -92,7 +92,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
             <h1 class="text-2xl font-bold mb-4">Menú</h1>
             <div class="flex flex-row flex-wrap justify-content-center gap-8">
                 <a href="Empleado_tux.php"
-                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:scale-105 transition-colors duration-300 overflow-hidden">
+                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:scale-105 transition delay-50 duration-200 overflow-hidden">
                     <div class="flex flex-col items-center justify-center gap-2 h-full overflow-y-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-10 h-10 flex-shrink-0">
@@ -103,7 +103,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                     </div>
                 </a>
                 <a href="Adm_tux.php"
-                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:scale-105 transition-colors duration-300 overflow-hidden admBtn">
+                    class="px-3 py-3 size-30 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:scale-105 transition delay-50 duration-200 overflow-hidden admBtn">
                     <div class="flex flex-col items-center justify-center gap-2 h-full overflow-y-auto">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-10 h-10 flex-shrink-0">
@@ -141,7 +141,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                 </button>
             </div>
             <input id="Lbtn" type="button" value="Iniciar Sesion" name="btn"
-                class="bg-white p-2 rounded-lg hover:scale-105 cursor-pointer text-black font-bold transition delay-50 duration-200 ">
+                class="bg-white p-2 rounded-lg cursor-pointer text-black font-bold hover:scale-105 transition delay-50 duration-200 ">
         </div>
     </form>
 
