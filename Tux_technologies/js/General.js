@@ -13,54 +13,75 @@ var AceptModalButton = document.getElementById("AceptModal");
 
 ActionButtons.forEach(function (button) {
   button.addEventListener("click", function () {
-    if (button.value != "Buscar" && button.value != "Limpiar") {
-      // Validar campos vacíos
-      var ElementosSeccion = document.querySelectorAll(
-        "." + accionesSelect.value,
-      );
+    //if anidados cambiados por un switch case
+    switch (button.value) {
+      case "Guardar":
+        // Validar campos vacíos
+        var ElementosSeccion = document.querySelectorAll(
+          "." + accionesSelect.value,
+        );
 
-      var vacio = false;
+        var vacio = false;
 
-      for (const elemento of ElementosSeccion) {
-        if (elemento.name === "Nombre") {
-          //encuentra el input con con el name nombre
-          var Nombre = elemento.value; //entonces obtenemos el texto del elemento
+        for (const elemento of ElementosSeccion) {
+          if (elemento.name === "Nombre") {
+            //encuentra el input con con el name nombre
+            var Nombre = elemento.value; //entonces obtenemos el texto del elemento
+          }
+
+          if (elemento.value.trim() === "") {
+            Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
+            vacio = true;
+            break;
+          }
         }
+        break;
 
-        if (elemento.value.trim() === "") {
-          Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
-          vacio = true;
+      case "Limpiar":
+        var vacio = true;
+
+        ResetElementos.forEach((element) => {
+          if (!element.classList.contains("select")) {
+            element.value = ""; // Limpia el valor de cada campo de entrada
+            preview.innerHTML =
+              '<span class="text-gray-500">Subir Imagen</span>'; //Eliminamos la vista previa de la imagen
+          }
+        });
+        break;
+
+      case "Buscar":
+        var ElementosSeccion = document.querySelectorAll(
+          "." + accionesSelect.value,
+        );
+
+        var vacio = false;
+
+        for (const elemento of ElementosSeccion) {
+          if (elemento.value.trim() === "") {
+            Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
+            vacio = true;
+            break;
+          } else if (elemento.name === "Nombre") {
+            //encuentra el input con con el name nombre
+            var Nombre = elemento.value; //entonces obtenemos el texto del elemento
+            break;
+          }
+        }
+        break;
+        case "Editar":
+          var vacio = false;
+          edId = document.querySelector("." + button.id); //Editar ID nos da el id del producto/categoria del que se pulsa boton
+          edNombre = document.getElementById("edNombre" + edId.textContent); //este seria el nombre del prodcuto/categoria
+          hddInput = document.getElementById("hddInput"); //Input oculto general en este caso lo usare para enviar el id para hacer la consulta si se desea editar
+          hddInput.value = edId.textContent; //hddinput = hidden input
+          var Nombre = edNombre.textContent;       
           break;
-        }
-      }
-    } else if (button.value == "Limpiar") {
-      var vacio = true;
 
-      ResetElementos.forEach((element) => {
-        if (!element.classList.contains("select")) {
-          element.value = ""; // Limpia el valor de cada campo de entrada
-          preview.innerHTML = '<span class="text-gray-500">Subir Imagen</span>'; //Eliminamos la vista previa de la imagen
-        }
-      });
-    } else if (button.value == "Buscar") {
-      var ElementosSeccion = document.querySelectorAll(
-        "." + accionesSelect.value,
-      );
-
-      var vacio = false;
-
-      for (const elemento of ElementosSeccion) {
-        if (elemento.value.trim() === "") {
-          Modal3.classList.remove("hidden"); // Muestra el modal de campos vacíos
-          vacio = true;
-          break;
-        } else if (elemento.name === "Nombre") {
-          //encuentra el input con con el name nombre
-          var Nombre = elemento.value; //entonces obtenemos el texto del elemento
-          break;
-        }
-      }
+      default:
+        var vacio = false;
+        var Nombre = "";
     }
+
     if (!vacio) {
       Modal.classList.remove("hidden"); // Muestra el modal de confirmación
       M_Title.value = button.value + " " + Nombre; // Cambia el título del modal según el botón de acción presionado
