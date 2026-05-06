@@ -22,6 +22,7 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
 
         if ($login) {
             if (password_verify($contra, $login["Contraseña"])) { // en password verify se pasa primero la contraseña que escribe el usuario luego se pasa la de la base de datos
+                session_regenerate_id(true);
                 $_SESSION["SESION_E"] = [
                     "Sesion" => true,
                     "Sesion_Info" => $login
@@ -164,7 +165,6 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
                     echo "<p>" . $Empleado_Info['Nombre'] . " " . $Empleado_Info['Apellido'] . "</p>
                     
                         <p>" . $Empleado_Info['Cargo'] . "</p>
-                    
                     ";
                 } ?>
                 <input name="btn" type="submit" value="cerrar sesion"

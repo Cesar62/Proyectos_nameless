@@ -126,37 +126,45 @@ if ($btn) {
             $campo = strtolower(trim($_POST["buscarPor"] ?? ""));
             $paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
-            if ($paginaActual < 1) $paginaActual = 1; //para que no escriban paginas negativas 
-            $incioConsulta = ($paginaActual - 1) * $porPagina; //Desde donde se van a empezar a buscar los registros
+            $tablasvalidas = ["productos", "categoria"];
 
-            if (vacio([$nombre, $tabla])) {
-                $errors[] = "Campos incompletos";
+            if (!in_array($tabla, $tablasvalidas)) { //evitar inyecciones sql
+                $errors[] = "Tabla no valida $tabla";
+                $_SESSION = [];
             } else {
-                $totalRegistros = $pdo->prepare("SELECT COUNT(*) FROM $tabla WHERE $campo = :campo");  //Toda esta consulta solo es para contar cuantos coinciden con lo que se busca
-                $totalRegistros->bindParam(":campo", $nombre, PDO::PARAM_STR);
-                $ok = $totalRegistros->execute();
 
-                if ($ok) {
-                    $conteo = $totalRegistros->fetchColumn();
+                if ($paginaActual < 1) $paginaActual = 1; //para que no escriban paginas negativas 
+                $incioConsulta = ($paginaActual - 1) * $porPagina; //Desde donde se van a empezar a buscar los registros
 
-                    if ($conteo > 0) { // Si funciona empesaria ya la consulta que va a mostrar resultados
-                        echo $conteo;
-                        $BusquedaSql = $pdo->prepare("SELECT * FROM $tabla WHERE $campo = :campo LIMIT $incioConsulta, $porPagina"); //consulta con limit
-                        $BusquedaSql->bindParam(":campo", $nombre, PDO::PARAM_STR);
-                        $ok = $BusquedaSql->execute();
-                        $busquedaArray = $BusquedaSql->fetchAll(PDO::FETCH_ASSOC);
-
-                        $_SESSION["exito"] = true;
-                        $_SESSION["Accion"] = $btn;
-                        $_SESSION["Acciones"] = $secciones;
-                        $_SESSION["busquedaArray"] = $busquedaArray;
-                        header("Location: Empleado_tux.php");
-                        exit();
-                    } else {
-                        $errors[] = "No encontró resultados";
-                    }
+                if (vacio([$nombre, $tabla])) {
+                    $errors[] = "Campos incompletos";
                 } else {
-                    $errors[] = "error en consulta sql";
+                    $totalRegistros = $pdo->prepare("SELECT COUNT(*) FROM $tabla WHERE $campo = :campo");  //Toda esta consulta solo es para contar cuantos coinciden con lo que se busca
+                    $totalRegistros->bindParam(":campo", $nombre, PDO::PARAM_STR);
+                    $ok = $totalRegistros->execute();
+
+                    if ($ok) {
+                        $conteo = $totalRegistros->fetchColumn();
+
+                        if ($conteo > 0) { // Si funciona empesaria ya la consulta que va a mostrar resultados
+                            echo $conteo;
+                            $BusquedaSql = $pdo->prepare("SELECT * FROM $tabla WHERE $campo = :campo LIMIT $incioConsulta, $porPagina"); //consulta con limit
+                            $BusquedaSql->bindParam(":campo", $nombre, PDO::PARAM_STR);
+                            $ok = $BusquedaSql->execute();
+                            $busquedaArray = $BusquedaSql->fetchAll(PDO::FETCH_ASSOC);
+
+                            $_SESSION["exito"] = true;
+                            $_SESSION["Accion"] = $btn;
+                            $_SESSION["Acciones"] = $secciones;
+                            $_SESSION["busquedaArray"] = $busquedaArray;
+                            header("Location: Empleado_tux.php");
+                            exit();
+                        } else {
+                            $errors[] = "No encontró resultados";
+                        }
+                    } else {
+                        $errors[] = "error en consulta sql";
+                    }
                 }
             }
 
@@ -164,7 +172,7 @@ if ($btn) {
 
         case "Editar":
             $id = trim($_POST["hddInput"] ?? "");
-            echo $id;
+            $sql = $pdo->prepare('SELECT * FROM productos');
 
             break;
 
