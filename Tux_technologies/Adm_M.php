@@ -2,6 +2,9 @@
 require 'Config/BD.php';
 
 session_start();
+session_set_cookie_params([
+    'lifetime' => 0, //  sin expiración = cookie de sesión
+]);
 
 $Session_estado = $_SESSION["SESION_E"]["Sesion"] ?? false; //Se guarda el estado de inicio de sesion del empleado
 $Empleado_Info = $_SESSION["SESION_E"]["Sesion_Info"] ?? [];   //Informacion del empleado
@@ -40,12 +43,11 @@ if (!empty($_POST)) { //si llega a fallar el metod post no va a hacer nada
     }
 
     if ($btn === "cerrar sesion") {
-        $_SESSION["SESION_E"] = [
-            "Sesion" => false,
-            "Sesion_Info" => []
-        ];
+        session_regenerate_id(true);
         $_SESSION = [];
         $Session_estado = false;
+        header("Location: Adm_M.php");
+        exit();
     }
 }
 ?>

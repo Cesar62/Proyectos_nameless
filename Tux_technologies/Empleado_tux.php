@@ -47,6 +47,10 @@ if ($btn) {
                 if (!empty($img) && $img['error'] === UPLOAD_ERR_OK && is_uploaded_file($img['tmp_name'])) { // Verifica que se ha subido un archivo sin errores
                     $directorio = "uploads/"; // Declaración de la carpeta donde se almacenarán las imágenes
 
+                    if (soloImagenes($img["type"])) {
+                        $errors[] = "Solo Imagenes";
+                    }
+
                     if (!is_dir($directorio)) {  //Si el directorio no existe se crea uno
                         mkdir($directorio, 0777, true);
                     }
@@ -61,7 +65,7 @@ if ($btn) {
 
                 if (vacio([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta])) {
                     $errors[] = "Campos incompletos";
-                } else {
+                } else if (!count($errors) > 0) {
                     if (registrar([$nombre, $precio, $categoria, $marca, $cantidad, $foto_ruta], "producto", ["Nombre", "Precio", "Categoria", "Marca", "Cantidad", "IMG"], $pdo)) {
                         if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
                             $errors[] = "Error al mover la imagen subida.";
@@ -87,6 +91,10 @@ if ($btn) {
                 if (!empty($img) && $img['error'] === UPLOAD_ERR_OK && is_uploaded_file($img['tmp_name'])) { // Verifica que se ha subido un archivo sin errores
                     $directorio = "uploads/"; // Declaración de la carpeta donde se almacenarán las imágenes
 
+                    if (soloImagenes($img["type"])) {
+                        $errors[] = "Solo Imagenes";
+                    }
+
                     if (!is_dir($directorio)) {  //Si el directorio no existe se crea uno
                         mkdir($directorio, 0777, true);
                     }
@@ -101,17 +109,18 @@ if ($btn) {
 
                 if (vacio([$nombre, $descripcion, $foto_ruta])) {
                     $errors[] = "Campos incompletos";
-                } else {
+                } else if (!count($errors) > 0) {
                     if (registrar([$nombre, $descripcion, $foto_ruta], "categoria", ["Nombre", "Descripcion", "IMG"], $pdo)) {
                         if (!move_uploaded_file($img['tmp_name'], $ruta_destino)) {
                             $errors[] = "Error al mover la imagen subida.";
+                        } else {
+                            $_SESSION["modal"] = true;
+                            $_SESSION["exito"] = true;
+                            $_SESSION["Accion"] = $btn;
+                            $_SESSION["Acciones"] = $secciones;
+                            header("Location: Empleado_tux.php");
+                            exit();
                         }
-                        $_SESSION["modal"] = true;
-                        $_SESSION["exito"] = true;
-                        $_SESSION["Accion"] = $btn;
-                        $_SESSION["Acciones"] = $secciones;
-                        header("Location: Empleado_tux.php");
-                        exit();
                     } else {
                         $errors[] = "Error al registrar la categoría en la base de datos.";
                     }
