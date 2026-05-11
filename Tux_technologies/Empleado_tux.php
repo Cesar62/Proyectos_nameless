@@ -20,6 +20,7 @@ $editar = false; //variable cuando se quieran editar documentos
 $porPagina = 5; //Esto guarda cuantos elementos se ven al consultar
 $totalPaginas = 0;
 $busqueda = $_SESSION["exito"] ?? false; // Si es true mostrara los resultados de la busqueda
+$segunTabla = $_SESSION["Tabla"] ?? ""; //Esta variable guarda la tabla a la que se le hacen consultas, para mostrar indices extras al consultar
 
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
@@ -135,7 +136,7 @@ if ($btn) {
             $campo = strtolower(trim($_POST["buscarPor"] ?? ""));
             $paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
-            $tablasvalidas = ["productos", "categoria"];
+            $tablasvalidas = ["producto", "categoria"];
 
             if (!in_array($tabla, $tablasvalidas)) { //evitar inyecciones sql
                 $errors[] = "Tabla no valida $tabla";
@@ -166,10 +167,11 @@ if ($btn) {
                             $_SESSION["Accion"] = $btn;
                             $_SESSION["Acciones"] = $secciones;
                             $_SESSION["busquedaArray"] = $busquedaArray;
+                            $_SESSION["Tabla"] = $tabla;
                             header("Location: Empleado_tux.php");
                             exit();
                         } else {
-                            $errors[] = "No encontró resultados";
+                            $errors[] = "No en contró resultados";
                         }
                     } else {
                         $errors[] = "error en consulta sql";
@@ -181,7 +183,7 @@ if ($btn) {
 
         case "Editar":
             $id = trim($_POST["hddInput"] ?? "");
-            $sql = $pdo->prepare('SELECT * FROM productos');
+            $sql = $pdo->prepare('SELECT * FROM ');
 
             break;
 
@@ -391,14 +393,22 @@ if (!$Session_estado) {
                     class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
                     type="button" value="Buscar">
                 <?php if ($busqueda): ?>
-                    <div class="grid grid-cols-4 gap-2 place-items-center text-lg w-full">
+                    <div class="flex flex-row px-2 gap-6 place-items-start text-lg w-full">
                         <p>ID</p>
                         <p>Nombre</p>
+                        <?php if ($segunTabla == "producto"): ?>
+                            <p>Precio</p>
+                            <p>Categoria</p>
+                        <?php endif; ?>
                     </div>
                     <?php foreach ($busquedaArray as $resultadoBusqueda): ?>
-                        <div class="grid grid-cols-4 p-2 gap-2 place-items-center w-full border-t-2 border-black">
+                        <div class="grid grid-flow-col p-2 gap-4 place-items-center w-full border-t-2 border-black">
                             <p class="btnbuscar<?php echo $resultadoBusqueda["ID"]; ?>"><?php echo $resultadoBusqueda["ID"]; ?></p>
                             <p id="edNombre<?php echo $resultadoBusqueda["ID"]; ?>"><?php echo $resultadoBusqueda["Nombre"]; ?></p>
+                            <?php if ($segunTabla == "producto"): ?>
+                                <p><?php echo $resultadoBusqueda["Precio"]; ?></p>
+                                <p><?php echo $resultadoBusqueda["Categoria"]; ?></p>
+                            <?php endif; ?>
                             <input id="btnbuscar<?php echo $resultadoBusqueda["ID"]; ?>"
                                 class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
                                 type="button" value="Editar">
@@ -465,7 +475,6 @@ if (!$Session_estado) {
     var buscarDiv = document.getElementById('Buscar');
     var Editar_crearSelect = document.getElementById('Editar_crear');
     var ResetElementos = document.querySelectorAll('.Producto, .Categoria');
-
 
     if (accionesSelect) { // Verifica si el elemento existe antes de agregar el event listener
         accionesSelect.addEventListener('change',
