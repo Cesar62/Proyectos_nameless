@@ -15,12 +15,12 @@ $secciones = $_POST['acciones'] ?? $_SESSION["Acciones"] ?? "";  //Guarda la zon
 $errors = [];  //Guarda los errores que puedan suceder
 $categoria = []; //Carga las categorias de la base de datos
 $exito = $_SESSION["exito"] ?? false; //lo uso para moverse de sesion si funciona alguna consulta 
-$busquedaArray = $_SESSION["busquedaArray"] ?? []; //Array que carga los datos
+$busquedaArray = $_SESSION["Busqueda"]["busquedaArray"] ?? []; //Array que carga los datos
 $editar = false; //variable cuando se quieran editar documentos
 $porPagina = 5; //Esto guarda cuantos elementos se ven al consultar
 $totalPaginas = 0;
 $busqueda = $_SESSION["exito"] ?? false; // Si es true mostrara los resultados de la busqueda
-$segunTabla = $_SESSION["Tabla"] ?? ""; //Esta variable guarda la tabla a la que se le hacen consultas, para mostrar indices extras al consultar
+$segunTabla = $_SESSION["Busqueda"]["Tabla"] ?? ""; //Esta variable guarda la tabla a la que se le hacen consultas, para mostrar indices extras al consultar
 
 
 $sql = $pdo->prepare('SELECT Nombre FROM categoria'); //Selecionamos los datos de la tabla
@@ -166,8 +166,8 @@ if ($btn) {
                             $_SESSION["exito"] = true;
                             $_SESSION["Accion"] = $btn;
                             $_SESSION["Acciones"] = $secciones;
-                            $_SESSION["busquedaArray"] = $busquedaArray;
-                            $_SESSION["Tabla"] = $tabla;
+                            $_SESSION["Busqueda"]["busquedaArray"] = $busquedaArray;
+                            $_SESSION["Busqueda"]["Tabla"] = $tabla;
                             header("Location: Empleado_tux.php");
                             exit();
                         } else {
@@ -183,8 +183,30 @@ if ($btn) {
 
         case "Editar":
             $id = trim($_POST["hddInput"] ?? "");
-            $sql = $pdo->prepare('SELECT * FROM ');
+            $consultaArray = explode(" ", $id) ?? [];
+            $tabla = $consultaArray[1];  //Tremenda molestia hacer todo esto;
+            $tabla = strtolower($tabla);
 
+            $tablasvalidas = ["producto", "categoria"];
+
+            if (!in_array($tabla, $tablasvalidas)) { //evitar inyecciones sql
+                $errors[] = "Tabla no valida $tabla";
+                $_SESSION = [];
+            } else {
+                $sql = $pdo->prepare("SELECT * FROM $tabla WHERE ID = :ID");
+                $sql->bindParam(":ID", $consultaArray[0], PDO::PARAM_STR);
+                $ok = $sql->execute();
+
+                if($ok){
+                    
+                    $_SESSION["exito"] = true;
+                    $_SESSION["Acciones"] = ucfirst($tabla);
+                    header("Location: Empleado_tux.php");
+                    exit();
+                }else{
+                    $errors[] = "Eror en consulta sql";
+                }
+            }
             break;
 
         case 'Eliminar':
@@ -214,9 +236,25 @@ if ($btn) {
     }
 }
 
+if (!$Session_estado) {
+    header("Location: Adm_M.php");
+    exit();
+}
+?>
 
+<!DOCTYPE html>
+<html lang="en">
 
-if ($modal) {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imagenes/rostro_tux_T.png">
+    <link rel="stylesheet" href="../src/output.css">
+    <title>Empleado_tux</title>
+</head>
+
+<?php
+if ($modal) { //Lo pongo aqui para que me cargue el css
     echo "
             <div id=modal2 class='fixed inset-0 z-20 bg-black/75 flex items-center justify-center'>
                 <div class='bg-white p-6 rounded-lg'>
@@ -240,23 +278,7 @@ if ($modal) {
         ";
     $errors = []; //Limpio la variable supongo
 }
-
-if (!$Session_estado) {
-    header("Location: Adm_M.php");
-    exit();
-}
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="imagenes/rostro_tux_T.png">
-    <link rel="stylesheet" href="../src/output.css">
-    <title>Empleado_tux</title>
-</head>
 
 <body class="bg-slate-900">
     <!-- Navbar -->
@@ -403,13 +425,14 @@ if (!$Session_estado) {
                     </div>
                     <?php foreach ($busquedaArray as $resultadoBusqueda): ?>
                         <div class="grid grid-flow-col p-2 gap-4 place-items-center w-full border-t-2 border-black">
+                            <input id="tabla<?php echo $resultadoBusqueda["ID"]; ?>" value="<?php echo $segunTabla; ?>" class="hidden">
                             <p class="btnbuscar<?php echo $resultadoBusqueda["ID"]; ?>"><?php echo $resultadoBusqueda["ID"]; ?></p>
                             <p id="edNombre<?php echo $resultadoBusqueda["ID"]; ?>"><?php echo $resultadoBusqueda["Nombre"]; ?></p>
                             <?php if ($segunTabla == "producto"): ?>
                                 <p><?php echo $resultadoBusqueda["Precio"]; ?></p>
                                 <p><?php echo $resultadoBusqueda["Categoria"]; ?></p>
                             <?php endif; ?>
-                            <input id="btnbuscar<?php echo $resultadoBusqueda["ID"]; ?>"
+                            <input id="<?php echo $resultadoBusqueda["ID"]; ?>"
                                 class="cursor-pointer hover:scale-105 px-4 py-2 w-30 bg-blue-500 text-white rounded-lg Action-B"
                                 type="button" value="Editar">
 

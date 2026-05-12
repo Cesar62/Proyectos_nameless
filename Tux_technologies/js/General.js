@@ -70,13 +70,12 @@ ActionButtons.forEach(function (button) {
         break;
         case "Editar":
           var vacio = false;
-          const queBusca = document.getElementById("quebusca"); //Para saber que tabla buscar
-          edId = document.querySelector("." + button.id); //Editar ID nos da el id del producto/categoria del que se pulsa boton
+          const queBusca = document.getElementById("tabla"+button.id); //Para saber que tabla buscar
+          edId = document.querySelector(".btnbuscar" + button.id); //Editar ID nos da el id del producto/categoria del que se pulsa boton
           edNombre = document.getElementById("edNombre" + edId.textContent); //este seria el nombre del prodcuto/categoria
           hddInput = document.getElementById("hddInput"); //Input oculto general en este caso lo usare para enviar el id para hacer la consulta si se desea editar
-          hddInput.value = edId.textContent; //hddinput = hidden input
-          var Nombre = edNombre.textContent + " " + queBusca.value;       
-          alert(Nombre);
+          hddInput.value = edId.textContent  + " " + queBusca.value; //hddinput = hidden input
+          var Nombre = edNombre.textContent;  
           break;
 
       default:
